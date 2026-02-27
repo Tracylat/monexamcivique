@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import './Auth.css';
 
 type LoginFormState = {
@@ -41,70 +42,69 @@ const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001').replace(/\/$/, '');
-      const urls = isLogin
-        ? [`${apiBaseUrl}/api/user/login`, `${apiBaseUrl}/login`]
-        : [`${apiBaseUrl}/api/user/register`, `${apiBaseUrl}/signup`];
-
-      const payload = isLogin
-        ? { email: form.email, password: form.password }
-        : {
-            email: form.email,
-            password: form.password,
-            name: form.name || form.email.split('@')[0] || 'Utilisateur',
-          };
-
-      let response: Response | null = null;
-      let data: any = null;
-      let lastError = '';
-
-      for (const url of urls) {
-        try {
-          const current = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-
-          if (current.status === 404) {
-            continue;
-          }
-
-          response = current;
-          const contentType = current.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            data = await current.json();
-          } else {
-            const text = await current.text();
-            data = text ? { error: text } : null;
-          }
-          break;
-        } catch {
-          lastError = `Impossible de joindre ${url}`;
-        }
-      }
-
-      if (!response) {
-        setErrorMessage(lastError || t('auth.backendUnreachable'));
-        return;
-      }
-
-      if (!response.ok) {
-        setErrorMessage(data?.error || t('auth.genericError'));
+      if (!isSupabaseConfigured || !supabase) {
+        setErrorMessage('Supabase non configuré. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.');
         return;
       }
 
       if (isLogin) {
-        localStorage.setItem('auth_user', JSON.stringify(data.user));
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+
+        if (error) {
+          setErrorMessage(error.message || t('auth.genericError'));
+          return;
+        }
+
+        const authUser = {
+          email: data.user?.email || form.email,
+          name: data.user?.user_metadata?.name || form.email.split('@')[0] || 'Utilisateur',
+          role: 'user',
+          id: data.user?.id,
+        };
+
+        localStorage.setItem('auth_user', JSON.stringify(authUser));
         navigate('/choice');
         return;
       }
 
-      setSuccessMessage(t('auth.accountCreated'));
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          data: {
+            name: form.name || form.email.split('@')[0] || 'Utilisateur',
+          },
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message || t('auth.genericError'));
+        return;
+      }
+
+      // Si la confirmation email est désactivée, on connecte direct l'utilisateur.
+      if (data.session && data.user) {
+        const authUser = {
+          email: data.user.email || form.email,
+          name: data.user.user_metadata?.name || form.name,
+          role: 'user',
+          id: data.user.id,
+        };
+        localStorage.setItem('auth_user', JSON.stringify(authUser));
+      }
+
+      setSuccessMessage(
+        data.session
+          ? t('auth.accountCreated')
+          : 'Compte créé. Vérifiez votre email pour confirmer votre inscription.'
+      );
       setIsLogin(true);
       setForm((prev) => ({ ...prev, password: '', confirmPassword: '' }));
-    } catch {
-      setErrorMessage(t('auth.backendCheck'));
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t('auth.genericError'));
     } finally {
       setIsSubmitting(false);
     }
