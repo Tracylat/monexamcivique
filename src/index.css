@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1a4d8f;
+  --primary-dark: #0f3466;
+  --accent: #ff6b35;
+  --success: #2d6a4f;
+  --danger: #d32f2f;
+}
+
+body {
+  font-family: 'Crimson Pro', serif;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: 'Darker Grotesque', sans-serif;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-family: 'Darker Grotesque', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  font-size: 1.1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #ff8f6b);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+}
+
+.btn-primary:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.hide {
+  display: none !important;
+}
+
+/* Custom Utilities */
+.text-primary { color: var(--primary); }
+.text-accent { color: var(--accent); }
+.bg-primary { background-color: var(--primary); }
+.bg-accent { background-color: var(--accent); }
