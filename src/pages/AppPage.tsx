@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import { questionsByLevel, sampleCards, encouragementMessages } from '../data/questions';
+import { TitleType, planMap, plans } from '../data/plans';
 
 type ViewState = 'selection' | 'quiz' | 'results' | 'dashboard' | 'flashcards' | 'exam' | 'examResults' | 'certificate' | 'statistics';
-type TitleType = 'CSP' | 'Résident' | 'Naturalisation';
+const isTitleType = (value: string | null): value is TitleType =>
+  value === 'CSP' || value === 'Résident' || value === 'Naturalisation';
 
 const AppPage: React.FC = () => {
   const [view, setView] = useState<ViewState>('dashboard');
@@ -35,6 +37,14 @@ const AppPage: React.FC = () => {
   // Encouragement
   const [encouragement, setEncouragement] = useState<{text: string, subtext: string} | null>(null);
   const shownEncouragements = useRef<string[]>([]);
+  const selectedPlanInfo = planMap[selectedTitle];
+
+  useEffect(() => {
+    const savedTitle = localStorage.getItem('selected_title');
+    if (isTitleType(savedTitle)) {
+      setSelectedTitle(savedTitle);
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize flashcards
@@ -45,6 +55,7 @@ const AppPage: React.FC = () => {
 
   const startQuiz = (title: TitleType) => {
     setSelectedTitle(title);
+    localStorage.setItem('selected_title', title);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
     setView('quiz');
@@ -197,7 +208,7 @@ const AppPage: React.FC = () => {
 
       {/* SELECTION VIEW */}
       {view === 'selection' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-[900px] mx-auto py-16 px-8">
             <div className="text-center mb-12">
               <h2 className="font-heading text-[2.8rem] font-extrabold text-[#0f3466] mb-4">Quel titre de séjour demandez-vous ?</h2>
@@ -229,7 +240,7 @@ const AppPage: React.FC = () => {
 
       {/* QUIZ VIEW */}
       {view === 'quiz' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-gradient-to-br from-[#1a4d8f] to-[#0f3466] text-white p-12 rounded-[20px] text-center mb-12">
             <h2 className="font-heading text-[2.8rem] font-extrabold mb-4">ÉVALUATION GRATUITE</h2>
             <p className="text-[1.3rem] mt-4">Testez vos chances de réussite</p>
@@ -245,7 +256,7 @@ const AppPage: React.FC = () => {
             <div className="font-heading text-[#ff6b35] font-bold text-lg mb-4 uppercase tracking-wider">
               Question {currentQuestionIndex + 1}/{questionsByLevel[selectedTitle].length}
             </div>
-            <div className="font-heading text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
+            <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
               {questionsByLevel[selectedTitle][currentQuestionIndex].q}
             </div>
             <div className="grid gap-4">
@@ -283,10 +294,10 @@ const AppPage: React.FC = () => {
 
       {/* RESULTS VIEW */}
       {view === 'results' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-white rounded-2xl p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-center max-w-[800px] mx-auto mb-8">
-            <h2 className="font-heading text-[2rem] text-gray-600">Votre score</h2>
-            <div className="font-heading text-[5rem] font-extrabold text-[#1a4d8f] my-4">{quizScore}/10</div>
+            <h2 className="font-heading text-3xl sm:text-[2rem] text-gray-600">Votre score</h2>
+            <div className="font-heading text-[3.5rem] sm:text-[5rem] font-extrabold text-[#1a4d8f] my-4">{quizScore}/10</div>
             <div className={`font-bold text-xl uppercase tracking-wider mb-6 ${
               quizScore >= 8 ? 'text-[#2d6a4f]' : quizScore >= 5 ? 'text-[#f59e0b]' : 'text-[#d32f2f]'
             }`}>
@@ -306,12 +317,12 @@ const AppPage: React.FC = () => {
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-[#fee2e2]">
                 <div className="font-semibold text-[#d32f2f] mb-4">En cas d'échec</div>
-                <div className="text-[2rem] font-bold text-[#d32f2f] mb-2">225€+</div>
+                <div className="text-3xl sm:text-[2rem] font-bold text-[#d32f2f] mb-2">225€+</div>
                 <div className="text-sm text-gray-600">Nouveaux timbres fiscaux<br/>+ 6 mois d'attente minimum<br/>+ Dossier bloqué</div>
               </div>
               <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-[#d1fae5]">
                 <div className="font-semibold text-[#2d6a4f] mb-4">✓ Avec Examen Civique Etrangers</div>
-                <div className="text-[2rem] font-bold text-[#2d6a4f] mb-2">20€</div>
+                <div className="text-3xl sm:text-[2rem] font-bold text-[#2d6a4f] mb-2">20€</div>
                 <div className="text-sm text-gray-600">Accès illimité 6 mois<br/>✓ 200+ questions réelles<br/>✓ Réussite garantie</div>
               </div>
             </div>
@@ -326,16 +337,37 @@ const AppPage: React.FC = () => {
 
       {/* DASHBOARD VIEW */}
       {view === 'dashboard' && (
-        <div className="max-w-[1200px] mx-auto p-8">
-          <div className="mb-8">
-            <h2 className="font-heading text-[2.5rem] font-bold text-[#1a4d8f]">🎯 Votre parcours de réussite</h2>
-            <p className="text-[1.2rem] opacity-95">Titre choisi : <span className="font-bold">{selectedTitle}</span></p>
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
+          <div className="mb-8 rounded-2xl bg-white p-5 sm:p-7 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[#1a4d8f]">🎯 Votre parcours de réussite</h2>
+            <p className="mt-2 text-base sm:text-lg opacity-95">
+              Formation active : <span className="font-bold">{selectedPlanInfo.labelFr}</span>
+            </p>
+            <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {plans.map((plan) => (
+                <button
+                  key={plan.id}
+                  className={`rounded-lg border px-4 py-3 text-left text-sm font-semibold transition ${
+                    selectedTitle === plan.id
+                      ? 'border-[#1a4d8f] bg-[#eef6ff] text-[#1a4d8f]'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-[#1a4d8f]'
+                  }`}
+                  onClick={() => {
+                    setSelectedTitle(plan.id);
+                    localStorage.setItem('selected_title', plan.id);
+                  }}
+                >
+                  <span className="mr-2">{plan.icon}</span>
+                  {plan.id}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex items-start gap-6 mb-6">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex flex-col sm:flex-row items-start gap-6 mb-6">
             <div className="text-[2.5rem] bg-[#e0f2fe] w-16 h-16 rounded-full flex items-center justify-center">📚</div>
             <div className="flex-1">
-              <div className="font-heading text-[1.5rem] font-bold text-[#1a4d8f] mb-2">1. Fiches de révision par thème</div>
+              <div className="font-heading text-2xl sm:text-[1.5rem] font-bold text-[#1a4d8f] mb-2">1. Fiches de révision par thème</div>
               <div className="text-gray-600 mb-4">🟢 Actif • <span className="font-bold">{masteredCardsCount}</span>/100 cartes maîtrisées</div>
               <div className="bg-gray-200 rounded-full h-2 w-full mb-4">
                 <div className="bg-[#2d6a4f] h-2 rounded-full transition-all" style={{ width: `${(masteredCardsCount/100)*100}%` }}></div>
@@ -344,10 +376,10 @@ const AppPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex items-start gap-6 mb-6">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex flex-col sm:flex-row items-start gap-6 mb-6">
             <div className={`text-[2.5rem] w-16 h-16 rounded-full flex items-center justify-center ${masteredCardsCount >= 50 ? 'bg-[#e0f2fe]' : 'bg-gray-100 grayscale opacity-50'}`}>✍️</div>
             <div className="flex-1">
-              <div className="font-heading text-[1.5rem] font-bold text-[#1a4d8f] mb-2">2. Examens blancs (40 questions)</div>
+              <div className="font-heading text-2xl sm:text-[1.5rem] font-bold text-[#1a4d8f] mb-2">2. Examens blancs (40 questions)</div>
               <div className="text-gray-600 mb-4">
                 {masteredCardsCount >= 50 ? `🟢 Actif • ${examsPassedCount}/3 examens réussis` : '🔒 Débloqué après 50 fiches maîtrisées'}
               </div>
@@ -364,10 +396,10 @@ const AppPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex items-start gap-6 mb-6">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex flex-col sm:flex-row items-start gap-6 mb-6">
             <div className={`text-[2.5rem] w-16 h-16 rounded-full flex items-center justify-center ${examsPassedCount >= 3 ? 'bg-[#e0f2fe]' : 'bg-gray-100 grayscale opacity-50'}`}>🏆</div>
             <div className="flex-1">
-              <div className="font-heading text-[1.5rem] font-bold text-[#1a4d8f] mb-2">3. Certificat de réussite</div>
+              <div className="font-heading text-2xl sm:text-[1.5rem] font-bold text-[#1a4d8f] mb-2">3. Certificat de réussite</div>
               <div className="text-gray-600 mb-4">
                 {examsPassedCount >= 3 ? '🟢 Disponible' : '🔒 Débloqué après 3 examens blancs réussis'}
               </div>
@@ -385,7 +417,7 @@ const AppPage: React.FC = () => {
 
       {/* FLASHCARDS VIEW */}
       {view === 'flashcards' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-[800px] mx-auto">
             <div className="bg-gradient-to-br from-[#1a4d8f] to-[#0f3466] text-white p-8 rounded-[20px] mb-12 text-center">
               <h2 className="font-heading text-[2.5rem] font-extrabold mb-4">📚 Fiches de révision</h2>
@@ -411,7 +443,7 @@ const AppPage: React.FC = () => {
                   WebkitBackfaceVisibility: 'hidden'
                 }}
               >
-                <div className="font-heading text-[2rem] font-bold text-[#1a1a1a] text-center">
+                <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a1a1a] text-center">
                   {flashcards[currentFlashcardIndex]?.question}
                 </div>
                 <p className="text-center text-gray-600 mt-8 text-[0.95rem]">👆 Cliquez pour voir la réponse</p>
@@ -427,7 +459,7 @@ const AppPage: React.FC = () => {
                   transformStyle: 'preserve-3d'
                 }}
               >
-                <div className="font-heading text-[2rem] font-bold text-[#1a4d8f] text-center mb-4">
+                <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a4d8f] text-center mb-4">
                   {flashcards[currentFlashcardIndex]?.answer}
                 </div>
                 <div className="text-center text-gray-700 text-lg">
@@ -450,10 +482,10 @@ const AppPage: React.FC = () => {
 
       {/* EXAM VIEW */}
       {view === 'exam' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-gradient-to-br from-[#1a4d8f] to-[#0f3466] text-white p-8 rounded-[20px] mb-8 flex justify-between items-center">
             <div>
-              <h2 className="font-heading text-[2rem] font-bold">EXAMEN BLANC</h2>
+              <h2 className="font-heading text-3xl sm:text-[2rem] font-bold">EXAMEN BLANC</h2>
               <p className="text-lg mt-2">Format officiel : 40 questions • 45 minutes</p>
             </div>
             <div className={`text-[2.5rem] font-mono font-bold bg-white/20 px-6 py-2 rounded-lg ${examTimeRemaining < 300 ? 'text-[#ff6b35]' : ''}`}>
@@ -465,7 +497,7 @@ const AppPage: React.FC = () => {
             <div className="font-heading text-[#ff6b35] font-bold text-lg mb-4 uppercase tracking-wider">
               Question {examCurrentQuestionIndex + 1}/40
             </div>
-            <div className="font-heading text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
+            <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
               {examQuestions[examCurrentQuestionIndex]?.q}
             </div>
             <div className="grid gap-4">
@@ -503,10 +535,10 @@ const AppPage: React.FC = () => {
 
       {/* EXAM RESULTS VIEW */}
       {view === 'examResults' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-white rounded-2xl p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-center max-w-[800px] mx-auto mb-8">
-            <h2 className="font-heading text-[2rem] text-gray-600">Résultat de l'examen blanc</h2>
-            <div className="font-heading text-[5rem] font-extrabold text-[#1a4d8f] my-4">{examScore}/40</div>
+            <h2 className="font-heading text-3xl sm:text-[2rem] text-gray-600">Résultat de l'examen blanc</h2>
+            <div className="font-heading text-[3.5rem] sm:text-[5rem] font-extrabold text-[#1a4d8f] my-4">{examScore}/40</div>
             <div className={`font-bold text-xl uppercase tracking-wider mb-6 ${examScore >= 32 ? 'text-[#2d6a4f]' : 'text-[#d32f2f]'}`}>
               {examScore >= 32 ? '✅ RÉUSSI' : '❌ ÉCHOUÉ'}
             </div>
@@ -521,14 +553,14 @@ const AppPage: React.FC = () => {
 
       {/* CERTIFICATE VIEW */}
       {view === 'certificate' && (
-        <div className="max-w-[1200px] mx-auto p-8">
+        <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-white p-16 rounded-2xl shadow-xl border-[10px] border-[#1a4d8f] text-center max-w-[900px] mx-auto relative overflow-hidden">
             <div className="absolute top-0 left-0 w-32 h-32 bg-[#1a4d8f] transform -translate-x-16 -translate-y-16 rotate-45"></div>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#1a4d8f] transform translate-x-16 translate-y-16 rotate-45"></div>
             
             <div className="text-[4rem] mb-4">🏆</div>
             <h1 className="font-heading text-[3.5rem] font-bold text-[#1a4d8f] mb-2 tracking-widest">CERTIFICAT</h1>
-            <h2 className="font-heading text-[2rem] font-bold text-[#ff6b35] mb-8 uppercase tracking-widest">De Réussite</h2>
+            <h2 className="font-heading text-3xl sm:text-[2rem] font-bold text-[#ff6b35] mb-8 uppercase tracking-widest">De Réussite</h2>
             
             <p className="text-[1.3rem] text-gray-600 mb-8">Ce certificat atteste que</p>
             <div className="font-heading text-[3rem] font-bold text-[#1a1a1a] mb-8 border-b-2 border-gray-200 inline-block px-12 pb-2">
@@ -537,7 +569,7 @@ const AppPage: React.FC = () => {
             
             <p className="text-[1.2rem] text-gray-600 leading-relaxed mb-8">
               a complété avec succès la formation de préparation à l'examen civique<br/>
-              pour l'obtention de <strong>la {selectedTitle === 'CSP' ? 'Carte de Séjour Pluriannuelle' : selectedTitle === 'Résident' ? 'Carte de Résident' : 'Naturalisation'}</strong>
+              pour l'obtention de <strong>{selectedPlanInfo.labelFr}</strong>
             </p>
             
             <div className="flex justify-center gap-12 mb-8">

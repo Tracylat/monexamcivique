@@ -37,8 +37,10 @@ body {
   font-family: 'Crimson Pro', serif;
   line-height: 1.6;
   color: var(--text);
-  background: var(--bg);
+  background: radial-gradient(1200px 500px at 10% -10%, #e7f0ff 0%, transparent 60%), radial-gradient(1000px 450px at 90% 0%, #fff2eb 0%, transparent 55%), var(--bg);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3, h4, h5, h6, .dg {
@@ -61,24 +63,27 @@ h1, h2, h3, h4, h5, h6, .dg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
-  border-radius: 10px;
+  gap: .45rem;
+  padding: .85rem 1.35rem;
+  border-radius: 12px;
   font-family: 'Darker Grotesque', sans-serif;
   font-weight: 700;
-  text-transform: uppercase;
+  letter-spacing: .01em;
   border: none;
   cursor: pointer;
-  transition: all .3s;
-  font-size: 1.1rem;
+  transition: all .22s ease;
+  font-size: 1.05rem;
   text-decoration: none;
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--accent) 0%, #ff8f6b 100%);
   color: #fff;
+  box-shadow: 0 10px 22px rgba(255, 107, 53, .28);
 }
 .btn-primary:hover {
-  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(255, 107, 53, .32);
 }
 
 .btn-cta {

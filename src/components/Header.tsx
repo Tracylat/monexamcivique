@@ -9,15 +9,15 @@ const Header: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <header className="bg-white shadow-[0_2px_16px_rgba(0,0,0,0.08)] sticky top-0 z-[100] py-3">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
+    <header className="sticky top-0 z-[100] border-b border-[#e6eef8] bg-white/90 py-2 backdrop-blur-md shadow-[0_10px_30px_rgba(15,52,102,0.07)]">
+      <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div
-          className="cursor-pointer"
+          className="cursor-pointer min-w-0"
           onClick={() => navigate('/')}
           aria-label={`${t('header.brandMain')} ${t('header.brandAccent')}`}
           title={`${t('header.brandMain')} ${t('header.brandAccent')}`}
         >
-          <div className="h-24 sm:h-28 lg:h-36 w-[320px] sm:w-[420px] lg:w-[520px] overflow-hidden">
+          <div className="h-14 sm:h-16 lg:h-20 w-[220px] sm:w-[320px] lg:w-[390px] overflow-hidden">
             <img src={logo} alt="Logo Mon Examen Civique" className="h-full w-full object-contain object-left" />
           </div>
         </div>

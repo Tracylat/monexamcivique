@@ -2,21 +2,35 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LanguageSwitcher: React.FC = () => {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const current = i18n.resolvedLanguage === 'en' ? 'en' : 'fr';
+  const setLang = (lang: 'fr' | 'en') => i18n.changeLanguage(lang);
 
   return (
-    <label className="bg-[#fafbfc] border-2 border-[#e2e8f0] py-2 px-3 rounded-lg flex gap-2 items-center font-semibold text-sm">
-      <select
-        value={current}
-        onChange={(e) => i18n.changeLanguage(e.target.value)}
-        className="bg-transparent outline-none cursor-pointer"
-        aria-label="Language"
+    <div
+      className="inline-flex items-center gap-1 rounded-full border border-[#d7e3f4] bg-white/90 p-1 shadow-sm backdrop-blur"
+      role="group"
+      aria-label="Language selector"
+    >
+      <button
+        type="button"
+        onClick={() => setLang('fr')}
+        className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold transition ${
+          current === 'fr' ? 'bg-[#1a4d8f] text-white' : 'text-[#1a4d8f] hover:bg-[#eef4fb]'
+        }`}
       >
-        <option value="fr">🇫🇷 {t('language.fr')}</option>
-        <option value="en">🇬🇧 {t('language.en')}</option>
-      </select>
-    </label>
+        🇫🇷 FR
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang('en')}
+        className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold transition ${
+          current === 'en' ? 'bg-[#1a4d8f] text-white' : 'text-[#1a4d8f] hover:bg-[#eef4fb]'
+        }`}
+      >
+        🇬🇧 EN
+      </button>
+    </div>
   );
 };
 

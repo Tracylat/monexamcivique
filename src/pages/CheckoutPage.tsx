@@ -3,9 +3,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useTranslation } from 'react-i18next';
 import { usePayment } from "../context/PaymentContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { STRIPE_PUBLIC_KEY, API_BASE_URL } from "../config/stripe";
 import Header from "../components/Header";
+import { normalizePlan, planMap, plans } from "../data/plans";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
@@ -16,6 +17,9 @@ const CheckoutForm = () => {
   const elements = useElements();
   const { markAsPaid } = usePayment();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedPlan = normalizePlan(searchParams.get('plan'));
+  const selectedPlanInfo = planMap[selectedPlan];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
@@ -51,7 +55,7 @@ const CheckoutForm = () => {
         body: JSON.stringify({
           email,
           name,
-          amount: 2000, // 20€
+          amount: selectedPlanInfo.price * 100,
           currency: "eur",
         }),
       });
@@ -84,6 +88,7 @@ const CheckoutForm = () => {
       } else if (result.paymentIntent?.status === "succeeded") {
         // Paiement réussi
         markAsPaid();
+        localStorage.setItem('selected_title', selectedPlan);
         navigate("/app");
       } else {
         setError(tr("Le paiement n'a pas abouti", 'Payment did not complete'));
@@ -96,25 +101,47 @@ const CheckoutForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">{tr('Paiement sécurisé', 'Secure payment')}</h1>
-        <p className="text-center text-gray-600 mb-8">{tr('Accès illimité à Mon Examen Civique', 'Unlimited access to My Civic Exam')}</p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-indigo-50 to-slate-100 px-4 py-8 sm:py-12">
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-6 lg:grid-cols-[1.05fr_1fr]">
+        <div className="rounded-2xl bg-white p-5 shadow-xl sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">{tr('Paiement sécurisé', 'Secure payment')}</h1>
+          <p className="text-center text-sm sm:text-base text-gray-600 mb-7">{tr('Accès illimité à Mon Examen Civique', 'Unlimited access to My Civic Exam')}</p>
 
-        <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-700 font-semibold">{tr('Accès Complet', 'Full Access')}</span>
-            <span className="text-3xl font-bold text-indigo-600">20€</span>
+          <div className="mb-6">
+            <p className="mb-3 text-sm font-semibold text-gray-700">{tr('Choisir la formation', 'Choose training')}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {plans.map((plan) => (
+                <button
+                  key={plan.id}
+                  type="button"
+                  onClick={() => setSearchParams({ plan: plan.id })}
+                  className={`rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                    selectedPlan === plan.id
+                      ? 'border-[#1a4d8f] bg-[#eef6ff] text-[#1a4d8f]'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-[#1a4d8f]'
+                  }`}
+                >
+                  {plan.icon} {plan.id}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="text-sm text-gray-600 space-y-2">
-            <div>{tr('✓ 200+ questions de révision', '✓ 200+ review questions')}</div>
-            <div>{tr('✓ 5 examens blancs', '✓ 5 mock exams')}</div>
-            <div>{tr('✓ Fiches interactives', '✓ Interactive cards')}</div>
-            <div>{tr('✓ Accès illimité', '✓ Unlimited access')}</div>
-          </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mb-8 p-5 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <div className="flex justify-between items-center mb-4 gap-2">
+              <span className="text-gray-700 font-semibold text-sm sm:text-base">
+                {tr('Formation choisie', 'Selected training')}: {selectedPlan}
+              </span>
+              <span className="text-2xl sm:text-3xl font-bold text-indigo-600">{selectedPlanInfo.price}€</span>
+            </div>
+            <div className="text-sm text-gray-600 space-y-2">
+              {selectedPlanInfo.featuresFr.slice(0, 3).map((featureFr, index) => (
+                <div key={`${selectedPlan}-feature-${index}`}>✓ {tr(featureFr, selectedPlanInfo.featuresEn[index])}</div>
+              ))}
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
           {stripeKeyMissing && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-700">
@@ -180,18 +207,33 @@ const CheckoutForm = () => {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading || !stripe || stripeKeyMissing}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? tr('Traitement...', 'Processing...') : tr('Payer 20€', 'Pay EUR 20')}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading || !stripe || stripeKeyMissing}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? tr('Traitement...', 'Processing...') : tr(`Payer ${selectedPlanInfo.price}€`, `Pay EUR ${selectedPlanInfo.price}`)}
+            </button>
+          </form>
 
-        <p className="text-center text-xs text-gray-500 mt-6">
-          🔒 {tr('Paiement sécurisé par Stripe • Garantie 30 jours • Aucun engagement', 'Secure payment by Stripe • 30-day guarantee • No commitment')}
-        </p>
+          <p className="text-center text-xs text-gray-500 mt-6">
+            🔒 {tr('Paiement sécurisé par Stripe • Garantie 30 jours • Aucun engagement', 'Secure payment by Stripe • 30-day guarantee • No commitment')}
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-[#0f3466] p-6 text-white shadow-xl sm:p-8">
+          <div className="text-5xl mb-4">{selectedPlanInfo.icon}</div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3">{tr(selectedPlanInfo.labelFr, selectedPlanInfo.labelEn)}</h2>
+          <p className="text-sm sm:text-base text-white/85 mb-5">{tr(selectedPlanInfo.descriptionFr, selectedPlanInfo.descriptionEn)}</p>
+          <p className="text-sm text-white/80 mb-6">{tr(selectedPlanInfo.durationFr, selectedPlanInfo.durationEn)}</p>
+          <div className="space-y-3">
+            {selectedPlanInfo.featuresFr.map((featureFr, index) => (
+              <div key={`${selectedPlan}-all-feature-${index}`} className="rounded-lg bg-white/10 px-3 py-2 text-sm">
+                ✓ {tr(featureFr, selectedPlanInfo.featuresEn[index])}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

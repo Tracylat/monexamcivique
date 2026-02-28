@@ -1,80 +1,14 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import logo from '../assets/logo.png';
 import Footer from '../components/Footer';
 
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isEn = i18n.resolvedLanguage === 'en';
   const tr = (fr: string, en: string) => (isEn ? en : fr);
-  const [quizState, setQuizState] = useState({
-    currentQuestion: 0,
-    score: 0,
-    showResult: false,
-    feedback: null as { isCorrect: boolean; text: string } | null,
-    answers: [] as number[]
-  });
-
-  const questions = isEn
-    ? [
-        { q: 'What does secularism mean?', o: ['Banning religions', 'Separation of Church and State', 'Mandatory atheism', 'An official religion'], ok: 1, e: 'Secularism means <strong>separation of Church and State</strong> (1905 law).' },
-        { q: 'How many members in the National Assembly?', o: ['348', '450', '577', '620'], ok: 2, e: '<strong>577 members</strong>, elected for 5 years.' },
-        { q: 'In which year was the death penalty abolished?', o: ['1968', '1975', '1981', '1995'], ok: 2, e: 'On <strong>October 9, 1981</strong>, under Mitterrand.' },
-        { q: 'Who appoints the Prime Minister?', o: ['Senate', 'National Assembly', 'President of the Republic', 'Constitutional Council'], ok: 2, e: 'The <strong>President of the Republic</strong> (Article 8).' },
-        { q: 'Is bigamy legal in France?', o: ['Yes', 'No, it is an offense', 'With judge approval', 'For foreigners'], ok: 1, e: '<strong>No</strong>, bigamy is an offense.' },
-        { q: 'What is the Republic motto?', o: ['Honor and Fatherland', 'Liberty, Equality, Fraternity', 'Unity, Strength, Progress', 'Work, Family, Fatherland'], ok: 1, e: '<strong>Liberty, Equality, Fraternity</strong>.' },
-        { q: 'What number for SAMU emergency?', o: ['15', '17', '18', '112'], ok: 0, e: '<strong>15</strong> = SAMU. 17 police, 18 firefighters, 112 EU emergency.' },
-        { q: 'Who ensures interim presidency on death?', o: ['Prime Minister', 'President of National Assembly', 'President of Senate', 'Justice Minister'], ok: 2, e: '<strong>President of the Senate</strong> (Article 7).' },
-        { q: 'In what year was the Fifth Republic founded?', o: ['1946', '1952', '1958', '1962'], ok: 2, e: 'In <strong>1958</strong> by de Gaulle.' },
-        { q: 'Which founding text dates from 1789?', o: ['Civil Code', 'Declaration of the Rights of Man and Citizen', 'Treaty of Rome', 'Constitution'], ok: 1, e: 'The <strong>Declaration of the Rights of Man and Citizen</strong> (Aug 26, 1789).' },
-      ]
-    : [
-        {q:"Que signifie la laïcité ?",o:["L'interdiction des religions","La séparation des Églises et de l'État","L'obligation d'être athée","Une religion officielle"],ok:1,e:"La laïcité = <strong>séparation des Églises et de l'État</strong> (loi de 1905)."},
-        {q:"Combien de députés à l'Assemblée nationale ?",o:["348","450","577","620"],ok:2,e:"<strong>577 députés</strong>, élus pour 5 ans."},
-        {q:"En quelle année la peine de mort a-t-elle été abolie ?",o:["1968","1975","1981","1995"],ok:2,e:"Le <strong>9 octobre 1981</strong>, sous Mitterrand (garde des Sceaux : Badinter)."},
-        {q:"Qui nomme le Premier ministre ?",o:["Le Sénat","L'Assemblée nationale","Le Président de la République","Le Conseil constitutionnel"],ok:2,e:"Le <strong>Président de la République</strong> (article 8 Constitution)."},
-        {q:"La bigamie est-elle légale en France ?",o:["Oui","Non, c'est un délit","Avec accord du juge","Pour les étrangers"],ok:1,e:"<strong>Non</strong>, la bigamie est un délit (article 433-20 Code pénal)."},
-        {q:"Quelle est la devise de la République ?",o:["Honneur et Patrie","Liberté, Égalité, Fraternité","Unité, Force, Progrès","Travail, Famille, Patrie"],ok:1,e:"<strong>Liberté, Égalité, Fraternité</strong> (article 2 Constitution)."},
-        {q:"Quel numéro pour le SAMU ?",o:["15","17","18","112"],ok:0,e:"Le <strong>15</strong> = SAMU. 17 = police, 18 = pompiers, 112 = européen."},
-        {q:"Qui assure l'intérim du Président en cas de décès ?",o:["Le Premier ministre","Le président de l'Assemblée","Le président du Sénat","Le Garde des Sceaux"],ok:2,e:"Le <strong>président du Sénat</strong> (article 7 Constitution)."},
-        {q:"En quelle année la Ve République a-t-elle été fondée ?",o:["1946","1952","1958","1962"],ok:2,e:"En <strong>1958</strong> par de Gaulle."},
-        {q:"Quel texte fondateur date de 1789 ?",o:["Le Code civil","La DDHC","Le traité de Rome","La Constitution"],ok:1,e:"La <strong>Déclaration des Droits de l'Homme et du Citoyen</strong> du 26 août 1789."}
-      ];
-
-  const handleAnswer = (optionIndex: number) => {
-    if (quizState.feedback) return;
-
-    const currentQ = questions[quizState.currentQuestion];
-    const isCorrect = optionIndex === currentQ.ok;
-
-    setQuizState(prev => ({
-      ...prev,
-      score: isCorrect ? prev.score + 1 : prev.score,
-      feedback: {
-        isCorrect,
-        text: currentQ.e
-      },
-      answers: [...prev.answers, optionIndex]
-    }));
-  };
-
-  const nextQuestion = () => {
-    if (quizState.currentQuestion < questions.length - 1) {
-      setQuizState(prev => ({
-        ...prev,
-        currentQuestion: prev.currentQuestion + 1,
-        feedback: null
-      }));
-    } else {
-      setQuizState(prev => ({
-        ...prev,
-        showResult: true
-      }));
-    }
-  };
 
   return (
     <div className="landing-page">
@@ -88,7 +22,7 @@ const LandingPage: React.FC = () => {
       <nav className="nav">
         <div className="container nav-inner">
           <Link to="/" className="nav-logo">
-            <div style={{ height: 120, width: 560, overflow: 'hidden' }}>
+            <div className="h-[64px] w-[220px] sm:h-[80px] sm:w-[320px] lg:h-[96px] lg:w-[420px] overflow-hidden">
               <img src={logo} alt="Logo Mon Examen Civique" style={{ height: '100%', width: '100%', objectFit: 'contain', objectPosition: 'left' }} />
             </div>
           </Link>
@@ -104,7 +38,7 @@ const LandingPage: React.FC = () => {
 
       {/* HERO */}
       <section className="hero">
-        <div className="container hero-grid">
+        <div className="container">
           <div className="hero-left">
             <h1 className="dg">{t('landing.heroTitle1')}<br/><em>{t('landing.heroTitle2')}</em><br/>{t('landing.heroTitle3')}</h1>
             <p className="hero-sub">{t('landing.heroSubtitle')}</p>
@@ -114,61 +48,8 @@ const LandingPage: React.FC = () => {
               <div className="hero-stat"><div className="hs-i" style={{background:'#fff3e0'}}>⏱️</div> {t('landing.statReady')}</div>
             </div>
             <div className="hero-btns">
-              <button 
-            onClick={() => navigate('/login')}
-          >
-              <a className="btn-big">{t('landing.ctaStart')} →</a>
-          </button>
+              <Link to="/app/free" className="btn-big">{t('landing.ctaStart')} →</Link>
               <a href="#parcours" className="btn-ghost">{t('landing.ctaPath')}</a>
-            </div>
-          </div>
-          <div>
-            {/* QUIZ CARD */}
-            <div className="qcard">
-              <div className="qcard-h dg">
-                <h3>🎯 {tr('Testez votre niveau', 'Test your level')}</h3>
-                <p>{tr("10 questions difficiles de l'examen", '10 difficult exam questions')}</p>
-              </div>
-              <div className="qcard-b">
-                {!quizState.showResult ? (
-                  <div id="qArea">
-                    <div className="qcard-q" dangerouslySetInnerHTML={{__html: questions[quizState.currentQuestion].q}}></div>
-                    <div className="qcard-opts">
-                      {questions[quizState.currentQuestion].o.map((opt, idx) => (
-                        <button
-                          key={idx}
-                          className={`qo ${quizState.feedback ? (idx === questions[quizState.currentQuestion].ok ? 'ok' : (idx === quizState.answers[quizState.currentQuestion] ? 'ko' : 'dim')) : ''}`}
-                          onClick={() => handleAnswer(idx)}
-                          disabled={!!quizState.feedback}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    {quizState.feedback && (
-                      <>
-                        <div className={`qfb ${quizState.feedback.isCorrect ? 'g' : 'r'}`} dangerouslySetInnerHTML={{__html: quizState.feedback.text}}></div>
-                        <div className="qnav">
-                          <div className="qdots">
-                            {questions.map((_, idx) => (
-                              <div key={idx} className={`qdot ${idx === quizState.currentQuestion ? 'on' : ''} ${idx < quizState.currentQuestion ? (quizState.answers[idx] === questions[idx].ok ? 'dg2' : 'dr') : ''}`}></div>
-                            ))}
-                          </div>
-                          <button className="qnxt" style={{display:'block'}} onClick={nextQuestion}>{tr('Suivante', 'Next')} →</button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="qres" style={{display:'block'}}>
-                    <div className="qres-s dg">{quizState.score}/10</div>
-                    <div className="qres-m">
-                      {quizState.score >= 8 ? tr("Excellent ! Vous êtes prêt.", "Excellent! You're ready.") : tr("Encore un peu d'entraînement...", 'A bit more training needed...')}
-                    </div>
-                    <a href="#tarifs" className="btn-cta" style={{fontSize:'1.1rem', padding:'12px 28px'}}>{tr('Préparez-vous sérieusement', 'Get serious preparation')} →</a>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -233,7 +114,7 @@ const LandingPage: React.FC = () => {
                 <div className="niv-result-icon">🎓</div>
                 <div className="niv-result-text">→ {tr('Message « Vous êtes prêt ! »', 'Message "You are ready!"')}</div>
               </div>
-              <Link to="/login" className="niv-btn dg">{tr('Choisir CSP', 'Choose CSP')} — 20 € →</Link>
+              <Link to="/choice" className="niv-btn dg">{tr('Choisir CSP', 'Choose CSP')} — 20 € →</Link>
             </div>
 
             {/* CR */}
@@ -262,7 +143,7 @@ const LandingPage: React.FC = () => {
                 <div className="niv-result-icon">🎓</div>
                 <div className="niv-result-text">→ {tr('Message « Vous êtes prêt ! »', 'Message "You are ready!"')}</div>
               </div>
-              <Link to="/login" className="niv-btn dg">{tr('Choisir CR', 'Choose RC')} — 20 € →</Link>
+              <Link to="/choice" className="niv-btn dg">{tr('Choisir CR', 'Choose RC')} — 20 € →</Link>
             </div>
 
             {/* NAT */}
@@ -291,7 +172,7 @@ const LandingPage: React.FC = () => {
                 <div className="niv-result-icon">🎓</div>
                 <div className="niv-result-text">→ {tr('Message « Vous êtes prêt ! »', 'Message "You are ready!"')}</div>
               </div>
-              <Link to="/login" className="niv-btn dg">{tr('Choisir NAT', 'Choose NAT')} — 20 € →</Link>
+              <Link to="/choice" className="niv-btn dg">{tr('Choisir NAT', 'Choose NAT')} — 20 € →</Link>
             </div>
           </div>
         </div>
@@ -316,7 +197,7 @@ const LandingPage: React.FC = () => {
                 <div className="tarif-i">{tr('Mises à jour gratuites', 'Free updates')}</div>
                 <div className="tarif-i">{tr('100 % compatible mobile', '100% mobile friendly')}</div>
               </div>
-              <Link to="/login" className="btn-big" style={{width:'100%', justifyContent:'center', fontSize:'1.3rem', padding:'16px 0'}}>{tr('Commencer ma préparation', 'Start my preparation')} — 20 € →</Link>
+              <Link to="/choice" className="btn-big" style={{width:'100%', justifyContent:'center', fontSize:'1.3rem', padding:'16px 0'}}>{tr('Commencer ma préparation', 'Start my preparation')} — 20 € →</Link>
             </div>
             <div className="tarif-compare">
               <h4 className="dg">💡 {tr("Comparez le coût d'un échec", 'Compare the cost of failure')}</h4>
@@ -414,7 +295,7 @@ const LandingPage: React.FC = () => {
         <div className="container">
           <h2 className="cta-t dg">{tr("Ne laissez pas 225 € et 6 mois s'envoler", "Don't lose EUR 225 and 6 months")}</h2>
           <p className="cta-s">{tr('Rejoignez les candidats qui réussissent du premier coup', 'Join candidates who pass on the first try')}</p>
-          <Link to="/login" className="cta-btn">{tr('Commencer pour 20 €', 'Start for EUR 20')} →</Link>
+          <Link to="/choice" className="cta-btn">{tr('Commencer pour 20 €', 'Start for EUR 20')} →</Link>
           <p className="cta-g">🔒 {tr('Paiement sécurisé · Garantie 30 jours · Accès illimité', 'Secure payment · 30-day guarantee · Unlimited access')}</p>
         </div>
       </section>
