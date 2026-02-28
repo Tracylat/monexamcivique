@@ -9,7 +9,22 @@ export const questionsByLevel = {
     { q: "Femmes : droit de vote en ?", answers: ["1936", "1944", "1946", "1958"], correct: 1, theme: "Histoire" },
     { q: "Régions en France métropolitaine ?", answers: ["12", "13", "18", "22"], correct: 1, theme: "Géographie" },
     { q: "Qu'est-ce que la laïcité ?", answers: ["Religion obligatoire", "Séparation État-religion", "Interdiction religions", "Religion d'État"], correct: 1, theme: "Valeurs" },
-    { q: "Loi séparation Église-État ?", answers: ["1789", "1881", "1905", "1946"], correct: 2, theme: "Histoire" }
+    { q: "Loi séparation Église-État ?", answers: ["1789", "1881", "1905", "1946"], correct: 2, theme: "Histoire" },
+    { q: "Couleurs du drapeau français ?", answers: ["Bleu Blanc Rouge", "Rouge Blanc Vert", "Bleu Jaune Rouge", "Blanc Rouge Noir"], correct: 0, theme: "Valeurs" },
+    { q: "Hymne national français ?", answers: ["Le Chant des Partisans", "La Marseillaise", "L'Ode à la joie", "Le Temps des cerises"], correct: 1, theme: "Valeurs" },
+    { q: "Fête nationale française ?", answers: ["1er mai", "11 novembre", "14 juillet", "8 mai"], correct: 2, theme: "Histoire" },
+    { q: "Âge de la majorité civile en France ?", answers: ["16 ans", "18 ans", "20 ans", "21 ans"], correct: 1, theme: "Droits" },
+    { q: "Monnaie utilisée en France ?", answers: ["Franc", "Dollar", "Euro", "Livre"], correct: 2, theme: "Institutions" },
+    { q: "Capitale de la France ?", answers: ["Lyon", "Paris", "Marseille", "Bordeaux"], correct: 1, theme: "Géographie" },
+    { q: "Combien de chambres compose le Parlement français ?", answers: ["1", "2", "3", "4"], correct: 1, theme: "Institutions" },
+    { q: "Les députés siègent à...", answers: ["Sénat", "Assemblée nationale", "Conseil d'État", "Préfecture"], correct: 1, theme: "Institutions" },
+    { q: "Premier article de la Constitution : la France est une République...", answers: ["religieuse", "indivisible, laïque, démocratique et sociale", "fédérale", "monarchique"], correct: 1, theme: "Institutions" },
+    { q: "Durée du mandat des conseillers municipaux ?", answers: ["4 ans", "5 ans", "6 ans", "7 ans"], correct: 2, theme: "Institutions" },
+    { q: "Qui représente l'État dans un département ?", answers: ["Le maire", "Le préfet", "Le député", "Le sénateur"], correct: 1, theme: "Institutions" },
+    { q: "Combien d'étoiles sur le drapeau de l'UE ?", answers: ["10", "12", "15", "27"], correct: 1, theme: "Institutions" },
+    { q: "Que garantit la liberté d'expression ?", answers: ["Le droit de voter", "Le droit de dire ses opinions", "Le droit de conduire", "Le droit d'être élu"], correct: 1, theme: "Droits" },
+    { q: "Quel texte fonde les droits de l'homme en France ?", answers: ["DDHC 1789", "Code civil 1804", "Loi 1905", "Traité de Rome"], correct: 0, theme: "Histoire" },
+    { q: "Quel est le rôle principal d'une mairie ?", answers: ["Faire les lois nationales", "Gérer les services locaux", "Diriger l'armée", "Rendre la justice pénale"], correct: 1, theme: "Institutions" }
   ],
   Résident: [
     { q: "Qui a instauré le Code Civil ?", answers: ["Louis XIV", "Napoléon", "De Gaulle", "Mitterrand"], correct: 1, theme: "Histoire" },
@@ -21,7 +36,22 @@ export const questionsByLevel = {
     { q: "Symbole de la République ?", answers: ["Marianne", "Jeanne d'Arc", "Napoléon", "Louis XIV"], correct: 0, theme: "Valeurs" },
     { q: "Hymne national ?", answers: ["Chant des Partisans", "La Marseillaise", "L'Internationale", "Ode à la Joie"], correct: 1, theme: "Valeurs" },
     { q: "Capitale européenne (Parlement) ?", answers: ["Bruxelles", "Strasbourg", "Luxembourg", "Francfort"], correct: 1, theme: "Institutions" },
-    { q: "Droit du sol ?", answers: ["Automatique", "Sous conditions", "Inexistant", "Payant"], correct: 1, theme: "Droits" }
+    { q: "Droit du sol ?", answers: ["Automatique", "Sous conditions", "Inexistant", "Payant"], correct: 1, theme: "Droits" },
+    { q: "Durée du mandat des sénateurs ?", answers: ["4 ans", "5 ans", "6 ans", "9 ans"], correct: 2, theme: "Institutions" },
+    { q: "Nombre de députés à l'Assemblée nationale ?", answers: ["348", "577", "705", "101"], correct: 1, theme: "Institutions" },
+    { q: "Qui nomme le Premier ministre ?", answers: ["Le Sénat", "Le Président de la République", "Le peuple", "Le Conseil constitutionnel"], correct: 1, theme: "Institutions" },
+    { q: "Ville siège du Conseil de l'Europe ?", answers: ["Bruxelles", "Paris", "Strasbourg", "Genève"], correct: 2, theme: "Institutions" },
+    { q: "Date de l'abolition des privilèges ?", answers: ["1789", "1792", "1804", "1848"], correct: 0, theme: "Histoire" },
+    { q: "Qui a aboli l'esclavage en 1848 en France ?", answers: ["Jules Ferry", "Victor Schoelcher", "Napoléon III", "Gambetta"], correct: 1, theme: "Histoire" },
+    { q: "Quelle collectivité n'est pas une région ?", answers: ["Île-de-France", "Provence-Alpes-Côte d'Azur", "Bretagne", "Aveyron"], correct: 3, theme: "Géographie" },
+    { q: "Quel est le rôle principal du Sénat ?", answers: ["Contrôler la constitution", "Représenter les collectivités territoriales", "Nommer les préfets", "Juger les délits"], correct: 1, theme: "Institutions" },
+    { q: "Quel est le principe de laïcité à l'école publique ?", answers: ["Cours de religion obligatoire", "Neutralité religieuse", "Interdiction des langues étrangères", "Sélection par religion"], correct: 1, theme: "Valeurs" },
+    { q: "Durée du mandat des députés ?", answers: ["4 ans", "5 ans", "6 ans", "7 ans"], correct: 1, theme: "Institutions" },
+    { q: "Quel texte fonde l'Union européenne ?", answers: ["Traité de Maastricht", "Code civil", "Constitution de 1958", "Loi 1905"], correct: 0, theme: "Institutions" },
+    { q: "Nombre de communes en France (ordre de grandeur) ?", answers: ["Environ 3 500", "Environ 35 000", "Environ 350", "Environ 350 000"], correct: 1, theme: "Géographie" },
+    { q: "Qui est compétent pour délivrer une carte de résident ?", answers: ["La mairie", "La préfecture", "Le tribunal", "Le consulat"], correct: 1, theme: "Droits" },
+    { q: "Quel est le but des élections européennes ?", answers: ["Élire les maires", "Élire les députés européens", "Élire le président français", "Voter les lois françaises"], correct: 1, theme: "Institutions" },
+    { q: "La République française est", answers: ["Une monarchie", "Une théocratie", "Une démocratie", "Une dictature"], correct: 2, theme: "Valeurs" }
   ],
   Naturalisation: [
     { q: "Qui a écrit les Misérables ?", answers: ["Zola", "Hugo", "Balzac", "Dumas"], correct: 1, theme: "Culture" },
@@ -33,7 +63,22 @@ export const questionsByLevel = {
     { q: "Ministre de la Justice (titre) ?", answers: ["Garde des Sceaux", "Premier Ministre", "Procureur", "Juge"], correct: 0, theme: "Institutions" },
     { q: "Fleuve passant à Bordeaux ?", answers: ["Loire", "Garonne", "Rhône", "Seine"], correct: 1, theme: "Géographie" },
     { q: "Devise de l'UE ?", answers: ["Unie dans la diversité", "Force et Honneur", "Liberté et Paix", "Union fait la force"], correct: 0, theme: "Institutions" },
-    { q: "Droit de grève (année) ?", answers: ["1864", "1905", "1936", "1946"], correct: 0, theme: "Histoire" }
+    { q: "Droit de grève (année) ?", answers: ["1864", "1905", "1936", "1946"], correct: 0, theme: "Histoire" },
+    { q: "Qui a rédigé en partie la Déclaration des droits de l'homme (1789) ?", answers: ["Robespierre", "Lafayette", "Napoléon", "Clemenceau"], correct: 1, theme: "Histoire" },
+    { q: "Quel est le siège du gouvernement français ?", answers: ["Élysée", "Matignon", "Luxembourg", "Palais Bourbon"], correct: 1, theme: "Institutions" },
+    { q: "Quelle institution juge les crimes les plus graves ?", answers: ["Cour d'assises", "Tribunal administratif", "Conseil d'État", "Cour des comptes"], correct: 0, theme: "Institutions" },
+    { q: "Quel écrivain est associé au mouvement des Lumières ?", answers: ["Voltaire", "Camus", "Proust", "Molière"], correct: 0, theme: "Culture" },
+    { q: "Date de la loi de séparation des Églises et de l'État ?", answers: ["1789", "1848", "1905", "1958"], correct: 2, theme: "Histoire" },
+    { q: "Quel océan borde la façade ouest de la France ?", answers: ["Océan Indien", "Océan Atlantique", "Océan Arctique", "Océan Pacifique"], correct: 1, theme: "Géographie" },
+    { q: "Le Conseil d'État est principalement", answers: ["Une assemblée élue", "Un tribunal administratif suprême", "Une police nationale", "Une chambre du Parlement"], correct: 1, theme: "Institutions" },
+    { q: "Quel personnage est lié à la Résistance intérieure française ?", answers: ["Jean Moulin", "Louis XVI", "Napoléon", "Richelieu"], correct: 0, theme: "Histoire" },
+    { q: "Quel est le principe du suffrage universel ?", answers: ["Vote réservé aux hommes", "Vote réservé aux diplômés", "Un citoyen, une voix", "Vote réservé aux propriétaires"], correct: 2, theme: "Droits" },
+    { q: "Quelle ville est la capitale des Gaules à l'époque romaine ?", answers: ["Marseille", "Paris", "Lyon", "Reims"], correct: 2, theme: "Histoire" },
+    { q: "Quel est le nom de la chambre basse du Parlement ?", answers: ["Sénat", "Assemblée nationale", "Conseil économique", "Conseil constitutionnel"], correct: 1, theme: "Institutions" },
+    { q: "Quel droit est protégé par la Constitution ?", answers: ["Droit d'être riche", "Droit à la santé et à l'éducation", "Droit de ne pas payer d'impôts", "Droit à la censure"], correct: 1, theme: "Droits" },
+    { q: "Quel artiste a composé le Boléro ?", answers: ["Debussy", "Ravel", "Berlioz", "Saint-Saëns"], correct: 1, theme: "Culture" },
+    { q: "Quelle mer borde le sud-est de la France ?", answers: ["Mer du Nord", "Mer Baltique", "Méditerranée", "Mer Noire"], correct: 2, theme: "Géographie" },
+    { q: "Être naturalisé français donne notamment", answers: ["Le droit de vote national", "Une exonération d'impôt à vie", "Le droit d'éviter les lois", "Le droit de quitter l'UE sans formalité"], correct: 0, theme: "Droits" }
   ]
 };
 
@@ -49,6 +94,15 @@ export const sampleCards = [
   { theme: "Droits", question: "Âge du droit de vote ?", answer: "18 ans", explanation: "Pour tous les citoyens français." },
   { theme: "Valeurs", question: "Loi séparation Église-État ?", answer: "1905", explanation: "Loi du 9 décembre 1905." }
 ];
+
+export const getFlashcardsForLevel = (level: keyof typeof questionsByLevel) => {
+  return questionsByLevel[level].map((q) => ({
+    theme: q.theme,
+    question: q.q,
+    answer: q.answers[q.correct],
+    explanation: `Thème: ${q.theme}`,
+  }));
+};
 
 export const encouragementMessages = [
   { trigger: 'cards-10', text: "Excellent début !", subtext: "Vous avez maîtrisé 10 cartes. Continuez comme ça !" },

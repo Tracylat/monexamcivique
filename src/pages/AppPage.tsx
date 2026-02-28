@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { questionsByLevel, sampleCards, encouragementMessages } from '../data/questions';
+import { questionsByLevel, encouragementMessages, getFlashcardsForLevel } from '../data/questions';
 import { TitleType, planMap, plans } from '../data/plans';
+import { addStudySession, getPlanProgress, getPurchasedPlans, getSelectedPlan, savePlanProgress, setSelectedPlan } from '../utils/access';
 
 type ViewState = 'selection' | 'quiz' | 'results' | 'dashboard' | 'flashcards' | 'exam' | 'examResults' | 'certificate' | 'statistics';
 const isTitleType = (value: string | null): value is TitleType =>
   value === 'CSP' || value === 'Résident' || value === 'Naturalisation';
 
 const AppPage: React.FC = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState<ViewState>('dashboard');
   const [selectedTitle, setSelectedTitle] = useState<TitleType>('CSP');
+  const [purchasedPlans, setPurchasedPlans] = useState<TitleType[]>([]);
   
   // Quiz State
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -33,6 +37,7 @@ const AppPage: React.FC = () => {
   const [examTimeRemaining, setExamTimeRemaining] = useState(45 * 60);
   const [examScore, setExamScore] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const getPassingScore = (totalQuestions: number) => Math.ceil(totalQuestions * 0.8);
 
   // Encouragement
   const [encouragement, setEncouragement] = useState<{text: string, subtext: string} | null>(null);
@@ -40,22 +45,34 @@ const AppPage: React.FC = () => {
   const selectedPlanInfo = planMap[selectedTitle];
 
   useEffect(() => {
-    const savedTitle = localStorage.getItem('selected_title');
-    if (isTitleType(savedTitle)) {
-      setSelectedTitle(savedTitle);
-    }
+    const bought = getPurchasedPlans();
+    setPurchasedPlans(bought);
+    if (bought.length === 0) return;
+
+    const saved = getSelectedPlan();
+    const initialPlan = saved && bought.includes(saved) ? saved : bought[0];
+    setSelectedTitle(initialPlan);
+
+    const progress = getPlanProgress(initialPlan);
+    setMasteredCardsCount(progress.masteredCardsCount);
+    setExamsPassedCount(progress.examsPassedCount);
+    setQuizScore(progress.lastQuizScore);
+    setExamScore(progress.lastExamScore);
   }, []);
 
   useEffect(() => {
-    // Initialize flashcards
-    const cards = [];
-    for(let i=0; i<10; i++) cards.push(...sampleCards);
-    setFlashcards(cards);
-  }, []);
+    // Flashcards spécifiques à la formation sélectionnée
+    const baseCards = getFlashcardsForLevel(selectedTitle);
+    const cards: typeof baseCards = [];
+    while (cards.length < 100) cards.push(...baseCards);
+    setFlashcards(cards.slice(0, 100));
+    setCurrentFlashcardIndex(0);
+    setIsFlipped(false);
+  }, [selectedTitle]);
 
   const startQuiz = (title: TitleType) => {
     setSelectedTitle(title);
-    localStorage.setItem('selected_title', title);
+    setSelectedPlan(title);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
     setView('quiz');
@@ -82,6 +99,18 @@ const AppPage: React.FC = () => {
       if (ans === questions[idx].correct) score++;
     });
     setQuizScore(score);
+    savePlanProgress(selectedTitle, {
+      masteredCardsCount,
+      examsPassedCount,
+      lastQuizScore: score,
+      lastExamScore: examScore,
+    });
+    addStudySession({
+      plan: selectedTitle,
+      minutes: 15,
+      dateISO: new Date().toISOString(),
+      source: 'quiz',
+    });
     setView('results');
   };
 
@@ -96,6 +125,12 @@ const AppPage: React.FC = () => {
     setMasteredCardsCount(prev => {
       const newVal = prev + 1;
       checkEncouragement(newVal);
+      savePlanProgress(selectedTitle, {
+        masteredCardsCount: newVal,
+        examsPassedCount,
+        lastQuizScore: quizScore,
+        lastExamScore: examScore,
+      });
       return newVal;
     });
     nextFlashcard();
@@ -130,16 +165,9 @@ const AppPage: React.FC = () => {
 
   // Exam Logic
   const startExam = () => {
-    const allQuestions = [...questionsByLevel.CSP, ...questionsByLevel.Résident, ...questionsByLevel.Naturalisation];
-    // Shuffle and pick 40
-    const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 40); // In real app, ensure 40 unique
-    // Since we have limited questions in sample, we might duplicate or just take what we have.
-    // For this demo, let's just take all available if < 40, or duplicate.
-    // The sample data has 10 per level = 30 total. Let's just use 30 for now or duplicate.
-    let examQs = [...shuffled];
-    while(examQs.length < 40) {
-        examQs = [...examQs, ...allQuestions].slice(0, 40);
-    }
+    const levelQuestions = [...questionsByLevel[selectedTitle]];
+    const shuffled = [...levelQuestions].sort(() => 0.5 - Math.random());
+    const examQs = shuffled.slice(0, Math.min(40, shuffled.length));
     
     setExamQuestions(examQs);
     setExamCurrentQuestionIndex(0);
@@ -166,9 +194,21 @@ const AppPage: React.FC = () => {
       if (examQuestions[idx] && ans === examQuestions[idx].correct) score++;
     });
     setExamScore(score);
-    if (score >= 32) {
-        setExamsPassedCount(prev => prev + 1);
-    }
+    const passingScore = getPassingScore(examQuestions.length);
+    const newExamsPassed = score >= passingScore ? examsPassedCount + 1 : examsPassedCount;
+    if (score >= passingScore) setExamsPassedCount(newExamsPassed);
+    savePlanProgress(selectedTitle, {
+      masteredCardsCount,
+      examsPassedCount: newExamsPassed,
+      lastQuizScore: quizScore,
+      lastExamScore: score,
+    });
+    addStudySession({
+      plan: selectedTitle,
+      minutes: 45,
+      dateISO: new Date().toISOString(),
+      source: 'exam',
+    });
     setView('examResults');
   };
 
@@ -195,6 +235,17 @@ const AppPage: React.FC = () => {
   return (
     <>
       <Header />
+      {purchasedPlans.length === 0 && (
+        <div className="max-w-[1200px] mx-auto p-6">
+          <div className="rounded-2xl bg-white p-8 shadow-lg text-center">
+            <h2 className="font-heading text-3xl font-bold text-[#1a4d8f] mb-3">Aucune formation active</h2>
+            <p className="text-gray-600 mb-6">Choisissez une formation et finalisez le paiement pour accéder au contenu complet.</p>
+            <button className="btn btn-primary" onClick={() => navigate('/choice')}>Aller au paiement</button>
+          </div>
+        </div>
+      )}
+      {purchasedPlans.length > 0 && (
+        <>
       
       {/* Encouragement Toast */}
       {encouragement && (
@@ -350,15 +401,27 @@ const AppPage: React.FC = () => {
                   className={`rounded-lg border px-4 py-3 text-left text-sm font-semibold transition ${
                     selectedTitle === plan.id
                       ? 'border-[#1a4d8f] bg-[#eef6ff] text-[#1a4d8f]'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-[#1a4d8f]'
+                      : purchasedPlans.includes(plan.id)
+                        ? 'border-gray-200 bg-white text-gray-700 hover:border-[#1a4d8f]'
+                        : 'border-gray-200 bg-gray-100 text-gray-400'
                   }`}
                   onClick={() => {
+                    if (!purchasedPlans.includes(plan.id)) {
+                      navigate(`/checkout?plan=${encodeURIComponent(plan.id)}`);
+                      return;
+                    }
                     setSelectedTitle(plan.id);
-                    localStorage.setItem('selected_title', plan.id);
+                    setSelectedPlan(plan.id);
+                    const progress = getPlanProgress(plan.id);
+                    setMasteredCardsCount(progress.masteredCardsCount);
+                    setExamsPassedCount(progress.examsPassedCount);
+                    setQuizScore(progress.lastQuizScore);
+                    setExamScore(progress.lastExamScore);
                   }}
                 >
                   <span className="mr-2">{plan.icon}</span>
                   {plan.id}
+                  {!purchasedPlans.includes(plan.id) && <span className="ml-2">🔒</span>}
                 </button>
               ))}
             </div>
@@ -486,7 +549,7 @@ const AppPage: React.FC = () => {
           <div className="bg-gradient-to-br from-[#1a4d8f] to-[#0f3466] text-white p-8 rounded-[20px] mb-8 flex justify-between items-center">
             <div>
               <h2 className="font-heading text-3xl sm:text-[2rem] font-bold">EXAMEN BLANC</h2>
-              <p className="text-lg mt-2">Format officiel : 40 questions • 45 minutes</p>
+              <p className="text-lg mt-2">Format officiel : {examQuestions.length} questions • 45 minutes</p>
             </div>
             <div className={`text-[2.5rem] font-mono font-bold bg-white/20 px-6 py-2 rounded-lg ${examTimeRemaining < 300 ? 'text-[#ff6b35]' : ''}`}>
               {formatTime(examTimeRemaining)}
@@ -495,7 +558,7 @@ const AppPage: React.FC = () => {
 
           <div className="bg-white rounded-2xl p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] mb-8">
             <div className="font-heading text-[#ff6b35] font-bold text-lg mb-4 uppercase tracking-wider">
-              Question {examCurrentQuestionIndex + 1}/40
+              Question {examCurrentQuestionIndex + 1}/{examQuestions.length}
             </div>
             <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
               {examQuestions[examCurrentQuestionIndex]?.q}
@@ -527,7 +590,7 @@ const AppPage: React.FC = () => {
               onClick={nextExamQuestion}
               disabled={examAnswers[examCurrentQuestionIndex] === undefined}
             >
-              {examCurrentQuestionIndex < 39 ? 'Question suivante' : 'Terminer l\'examen'}
+              {examCurrentQuestionIndex < examQuestions.length - 1 ? 'Question suivante' : 'Terminer l\'examen'}
             </button>
           </div>
         </div>
@@ -538,11 +601,12 @@ const AppPage: React.FC = () => {
         <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="bg-white rounded-2xl p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-center max-w-[800px] mx-auto mb-8">
             <h2 className="font-heading text-3xl sm:text-[2rem] text-gray-600">Résultat de l'examen blanc</h2>
-            <div className="font-heading text-[3.5rem] sm:text-[5rem] font-extrabold text-[#1a4d8f] my-4">{examScore}/40</div>
-            <div className={`font-bold text-xl uppercase tracking-wider mb-6 ${examScore >= 32 ? 'text-[#2d6a4f]' : 'text-[#d32f2f]'}`}>
-              {examScore >= 32 ? '✅ RÉUSSI' : '❌ ÉCHOUÉ'}
+            <div className="font-heading text-[3.5rem] sm:text-[5rem] font-extrabold text-[#1a4d8f] my-4">{examScore}/{examQuestions.length}</div>
+            <div className={`font-bold text-xl uppercase tracking-wider mb-6 ${examScore >= getPassingScore(examQuestions.length) ? 'text-[#2d6a4f]' : 'text-[#d32f2f]'}`}>
+              {examScore >= getPassingScore(examQuestions.length) ? '✅ RÉUSSI' : '❌ ÉCHOUÉ'}
             </div>
             <p className="mt-6 text-[1.1rem] text-gray-600">Temps écoulé : <strong>{formatTime((45*60) - examTimeRemaining)}</strong></p>
+            <p className="text-gray-600">Seuil de réussite: <strong>{getPassingScore(examQuestions.length)}/{examQuestions.length}</strong></p>
           </div>
 
           <div className="text-center mt-8">
@@ -591,6 +655,8 @@ const AppPage: React.FC = () => {
             <button className="btn bg-gray-600 text-white ml-4" onClick={() => setView('dashboard')}>Retour au tableau de bord</button>
           </div>
         </div>
+      )}
+        </>
       )}
     </>
   );

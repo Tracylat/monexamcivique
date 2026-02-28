@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AppPage from './pages/AppPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ChoicePage from './pages/ChoicePage';
@@ -8,12 +8,27 @@ import FreePage from './pages/FreePage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import { PaymentProvider } from './context/PaymentContext';
+import UserSpacePage from './pages/UserSpacePage';
+import { getPurchasedPlans, isLoggedIn } from './utils/access';
 
 type ProtectedRouteProps = {
   element: ReactElement;
 };
 
-function ProtectedRoute({ element }: ProtectedRouteProps) {
+function RequireAuth({ element }: ProtectedRouteProps) {
+  const location = useLocation();
+  if (!isLoggedIn()) {
+    const next = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/login?next=${next}`} replace />;
+  }
+  return element;
+}
+
+function RequirePaidPlan({ element }: ProtectedRouteProps) {
+  const purchasedPlans = getPurchasedPlans();
+  if (purchasedPlans.length === 0) {
+    return <Navigate to="/choice" replace />;
+  }
   return element;
 }
 
@@ -24,13 +39,14 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/choice" element={<ChoicePage />} />
+          <Route path="/choice" element={<RequireAuth element={<ChoicePage />} />} />
           <Route path="/app/free" element={<FreePage />} />
-          <Route path="/app" element={<ProtectedRoute element={<AppPage />} />} />
-          <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
-          <Route path="/admin/quiz" element={<ProtectedRoute element={<DashboardPage />} />} />
-          <Route path="/admin/questions" element={<ProtectedRoute element={<DashboardPage />} />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/app" element={<RequireAuth element={<RequirePaidPlan element={<AppPage />} />} />} />
+          <Route path="/espace" element={<RequireAuth element={<UserSpacePage />} />} />
+          <Route path="/dashboard" element={<RequireAuth element={<DashboardPage />} />} />
+          <Route path="/admin/quiz" element={<RequireAuth element={<DashboardPage />} />} />
+          <Route path="/admin/questions" element={<RequireAuth element={<DashboardPage />} />} />
+          <Route path="/checkout" element={<RequireAuth element={<CheckoutPage />} />} />
         </Routes>
       </BrowserRouter>
     </PaymentProvider>

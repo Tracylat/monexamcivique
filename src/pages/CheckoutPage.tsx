@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { STRIPE_PUBLIC_KEY, API_BASE_URL } from "../config/stripe";
 import Header from "../components/Header";
 import { normalizePlan, planMap, plans } from "../data/plans";
+import { addPurchasedPlan, setSelectedPlan } from "../utils/access";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
@@ -88,7 +89,8 @@ const CheckoutForm = () => {
       } else if (result.paymentIntent?.status === "succeeded") {
         // Paiement réussi
         markAsPaid();
-        localStorage.setItem('selected_title', selectedPlan);
+        addPurchasedPlan(selectedPlan);
+        setSelectedPlan(selectedPlan);
         navigate("/app");
       } else {
         setError(tr("Le paiement n'a pas abouti", 'Payment did not complete'));
@@ -214,6 +216,7 @@ const CheckoutForm = () => {
             >
               {loading ? tr('Traitement...', 'Processing...') : tr(`Payer ${selectedPlanInfo.price}€`, `Pay EUR ${selectedPlanInfo.price}`)}
             </button>
+
           </form>
 
           <p className="text-center text-xs text-gray-500 mt-6">
