@@ -30,6 +30,7 @@ const LoginPage: React.FC = () => {
   const updateField = (field: keyof LoginFormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+  const tr = (fr: string, en: string) => (i18n.resolvedLanguage === 'en' ? en : fr);
 
   const nextFromQuery = (() => {
     const params = new URLSearchParams(location.search);
@@ -49,7 +50,6 @@ const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const tr = (fr: string, en: string) => (i18n.resolvedLanguage === 'en' ? en : fr);
       if (!isSupabaseConfigured || !supabase) {
         setErrorMessage(
           tr(
@@ -61,13 +61,33 @@ const LoginPage: React.FC = () => {
       }
 
       if (isLogin) {
+        const normalizedEmail = form.email.trim().toLowerCase();
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: form.email,
+          email: normalizedEmail,
           password: form.password,
         });
 
         if (error) {
-          setErrorMessage(error.message || t('auth.genericError'));
+          const message = error.message || t('auth.genericError');
+          if (/invalid login credentials/i.test(message)) {
+            setErrorMessage(
+              tr(
+                "Identifiants invalides. Vérifiez l'e-mail/mot de passe, et confirmez votre e-mail si nécessaire.",
+                'Invalid credentials. Check your email/password, and confirm your email if needed.',
+              ),
+            );
+            return;
+          }
+          if (/email not confirmed/i.test(message)) {
+            setErrorMessage(
+              tr(
+                "Votre e-mail n'est pas encore confirmé. Vérifiez votre boîte mail.",
+                'Your email is not confirmed yet. Please check your inbox.',
+              ),
+            );
+            return;
+          }
+          setErrorMessage(message);
           return;
         }
 
@@ -84,7 +104,7 @@ const LoginPage: React.FC = () => {
       }
 
       const { data, error } = await supabase.auth.signUp({
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         password: form.password,
         options: {
           data: {
@@ -119,6 +139,48 @@ const LoginPage: React.FC = () => {
       );
       setIsLogin(true);
       setForm((prev) => ({ ...prev, password: '', confirmPassword: '' }));
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t('auth.genericError'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (!supabase || !isSupabaseConfigured) {
+      setErrorMessage(
+        tr(
+          "Configuration Supabase manquante: ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.",
+          "Missing Supabase configuration: add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+        ),
+      );
+      return;
+    }
+
+    const email = form.email.trim().toLowerCase();
+    if (!email) {
+      setErrorMessage(tr('Entrez votre e-mail puis cliquez sur mot de passe oublié.', 'Enter your email then click forgot password.'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+      setSuccessMessage(
+        tr(
+          "E-mail de réinitialisation envoyé. Vérifiez votre boîte mail.",
+          'Reset email sent. Please check your inbox.',
+        ),
+      );
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : t('auth.genericError'));
     } finally {
@@ -200,6 +262,17 @@ const LoginPage: React.FC = () => {
           <button type="submit" className="auth-submit" disabled={isSubmitting}>
             {isSubmitting ? t('auth.submitLoading') : isLogin ? t('auth.submitLogin') : t('auth.submitSignup')}
           </button>
+
+          {isLogin && (
+            <button
+              type="button"
+              className="auth-switch"
+              onClick={handleForgotPassword}
+              disabled={isSubmitting}
+            >
+              {tr('Mot de passe oublié ?', 'Forgot password?')}
+            </button>
+          )}
 
           <button
             type="button"
