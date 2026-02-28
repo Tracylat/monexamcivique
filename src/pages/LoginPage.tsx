@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import './Auth.css';
 
 type LoginFormState = {
@@ -49,80 +50,77 @@ const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const tr = (fr: string, en: string) => (i18n.resolvedLanguage === 'en' ? en : fr);
-      const apiBaseUrlEnv = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-      const apiBaseUrl = apiBaseUrlEnv || (import.meta.env.DEV ? 'http://localhost:5001' : '');
-
-      if (!apiBaseUrl) {
-        setErrorMessage(tr(
-          "Configuration manquante: ajoutez VITE_API_URL dans l'environnement.",
-          'Missing configuration: add VITE_API_URL in environment variables.',
-        ));
-        return;
-      }
-
-      const urls = isLogin
-        ? [`${apiBaseUrl}/api/user/login`]
-        : [`${apiBaseUrl}/api/user/register`];
-
-      const payload = isLogin
-        ? { email: form.email, password: form.password }
-        : {
-            email: form.email,
-            password: form.password,
-            name: form.name || form.email.split('@')[0] || 'Utilisateur',
-          };
-
-      let response: Response | null = null;
-      let data: any = null;
-      let lastError = '';
-
-      for (const url of urls) {
-        try {
-          const current = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-
-          if (current.status === 404) {
-            continue;
-          }
-
-          response = current;
-          const contentType = current.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            data = await current.json();
-          } else {
-            const text = await current.text();
-            data = text ? { error: text } : null;
-          }
-          break;
-        } catch {
-          lastError = `Impossible de joindre ${url}`;
-        }
-      }
-
-      if (!response) {
-        setErrorMessage(lastError || t('auth.backendUnreachable'));
-        return;
-      }
-
-      if (!response.ok) {
-        setErrorMessage(data?.error || t('auth.genericError'));
+      if (!isSupabaseConfigured || !supabase) {
+        setErrorMessage(
+          tr(
+            "Configuration Supabase manquante: ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.",
+            "Missing Supabase configuration: add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+          ),
+        );
         return;
       }
 
       if (isLogin) {
-        localStorage.setItem('auth_user', JSON.stringify(data.user));
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+
+        if (error) {
+          setErrorMessage(error.message || t('auth.genericError'));
+          return;
+        }
+
+        localStorage.setItem(
+          'auth_user',
+          JSON.stringify({
+            id: data.user?.id,
+            email: data.user?.email,
+            name: data.user?.user_metadata?.full_name || data.user?.email?.split('@')[0] || 'Utilisateur',
+          }),
+        );
         navigate(nextFromQuery);
         return;
       }
 
-      setSuccessMessage(t('auth.accountCreated'));
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          data: {
+            full_name: form.name || form.email.split('@')[0] || 'Utilisateur',
+          },
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message || t('auth.genericError'));
+        return;
+      }
+
+      if (data.session && data.user) {
+        localStorage.setItem(
+          'auth_user',
+          JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Utilisateur',
+          }),
+        );
+        navigate(nextFromQuery);
+        return;
+      }
+
+      setSuccessMessage(
+        tr(
+          "Compte créé. Vérifiez votre e-mail puis connectez-vous.",
+          "Account created. Check your email, then sign in.",
+        ),
+      );
       setIsLogin(true);
       setForm((prev) => ({ ...prev, password: '', confirmPassword: '' }));
-    } catch {
-      setErrorMessage(t('auth.backendCheck'));
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t('auth.genericError'));
     } finally {
       setIsSubmitting(false);
     }
