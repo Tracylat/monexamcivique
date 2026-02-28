@@ -14,7 +14,7 @@ type LoginFormState = {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -48,10 +48,21 @@ const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001').replace(/\/$/, '');
+      const tr = (fr: string, en: string) => (i18n.resolvedLanguage === 'en' ? en : fr);
+      const apiBaseUrlEnv = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+      const apiBaseUrl = apiBaseUrlEnv || (import.meta.env.DEV ? 'http://localhost:5001' : '');
+
+      if (!apiBaseUrl) {
+        setErrorMessage(tr(
+          "Configuration manquante: ajoutez VITE_API_URL dans l'environnement.",
+          'Missing configuration: add VITE_API_URL in environment variables.',
+        ));
+        return;
+      }
+
       const urls = isLogin
-        ? [`${apiBaseUrl}/api/user/login`, `${apiBaseUrl}/login`]
-        : [`${apiBaseUrl}/api/user/register`, `${apiBaseUrl}/signup`];
+        ? [`${apiBaseUrl}/api/user/login`]
+        : [`${apiBaseUrl}/api/user/register`];
 
       const payload = isLogin
         ? { email: form.email, password: form.password }
