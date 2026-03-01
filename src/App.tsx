@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AppPage from './pages/AppPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -7,9 +7,10 @@ import DashboardPage from './pages/DashboardPage';
 import FreePage from './pages/FreePage';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+import { supabase } from './lib/supabase';
 import { PaymentProvider } from './context/PaymentContext';
 import UserSpacePage from './pages/UserSpacePage';
-import { getPurchasedPlans, isLoggedIn } from './utils/access';
+import { getPurchasedPlans, isLoggedIn, setAuthUserFromSupabaseUser } from './utils/access';
 
 type ProtectedRouteProps = {
   element: ReactElement;
@@ -33,6 +34,34 @@ function RequirePaidPlan({ element }: ProtectedRouteProps) {
 }
 
 function App() {
+  const [authReady, setAuthReady] = useState(!supabase);
+
+  useEffect(() => {
+    if (!supabase) {
+      setAuthReady(true);
+      return;
+    }
+
+    let mounted = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      setAuthUserFromSupabaseUser(data.session?.user ?? null);
+      if (mounted) setAuthReady(true);
+    });
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUserFromSupabaseUser(session?.user ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      data.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (!authReady) {
+    return null;
+  }
+
   return (
     <PaymentProvider>
       <BrowserRouter>

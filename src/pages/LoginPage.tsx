@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { setAuthUserFromSupabaseUser } from '../utils/access';
 import './Auth.css';
 
 type LoginFormState = {
@@ -91,14 +92,7 @@ const LoginPage: React.FC = () => {
           return;
         }
 
-        localStorage.setItem(
-          'auth_user',
-          JSON.stringify({
-            id: data.user?.id,
-            email: data.user?.email,
-            name: data.user?.user_metadata?.full_name || data.user?.email?.split('@')[0] || 'Utilisateur',
-          }),
-        );
+        setAuthUserFromSupabaseUser(data.user ?? null);
         navigate(nextFromQuery);
         return;
       }
@@ -119,14 +113,7 @@ const LoginPage: React.FC = () => {
       }
 
       if (data.session && data.user) {
-        localStorage.setItem(
-          'auth_user',
-          JSON.stringify({
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Utilisateur',
-          }),
-        );
+        setAuthUserFromSupabaseUser(data.user);
         navigate(nextFromQuery);
         return;
       }
@@ -179,6 +166,54 @@ const LoginPage: React.FC = () => {
         tr(
           "E-mail de réinitialisation envoyé. Vérifiez votre boîte mail.",
           'Reset email sent. Please check your inbox.',
+        ),
+      );
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t('auth.genericError'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleMagicLinkLogin = async () => {
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (!supabase || !isSupabaseConfigured) {
+      setErrorMessage(
+        tr(
+          "Configuration Supabase manquante: ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.",
+          "Missing Supabase configuration: add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+        ),
+      );
+      return;
+    }
+
+    const email = form.email.trim().toLowerCase();
+    if (!email) {
+      setErrorMessage(tr("Entrez votre e-mail pour recevoir un lien de connexion.", "Enter your email to receive a login link."));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      setSuccessMessage(
+        tr(
+          "Lien magique envoyé. Ouvrez votre e-mail et cliquez sur le lien pour vous connecter.",
+          "Magic link sent. Open your email and click the link to sign in.",
         ),
       );
     } catch (error) {
@@ -271,6 +306,17 @@ const LoginPage: React.FC = () => {
               disabled={isSubmitting}
             >
               {tr('Mot de passe oublié ?', 'Forgot password?')}
+            </button>
+          )}
+
+          {isLogin && (
+            <button
+              type="button"
+              className="auth-switch"
+              onClick={handleMagicLinkLogin}
+              disabled={isSubmitting}
+            >
+              {tr('Connexion sans mot de passe (lien magique)', 'Passwordless login (magic link)')}
             </button>
           )}
 
