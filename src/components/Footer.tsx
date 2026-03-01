@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '../assets/logo.png';
 
 const Footer: React.FC = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -8,13 +9,13 @@ const Footer: React.FC = () => {
   const Modal: React.FC<{ id: string; title: string; children: React.ReactNode }> = ({ id, title, children }) => {
     if (activeModal !== id) return null;
     return (
-      <div className="fixed inset-0 bg-[#0b2848]/65 backdrop-blur-sm z-[1000] flex items-center justify-center p-8 animate-fadeIn" onClick={closeModal}>
-        <div className="bg-white rounded-2xl max-w-[760px] w-full max-h-[85vh] overflow-y-auto shadow-2xl relative animate-slideUp text-left" onClick={e => e.stopPropagation()}>
-          <div className="sticky top-0 bg-[#1a4d8f] text-white p-6 rounded-t-2xl flex items-center justify-between z-10">
-            <h2 className="font-heading text-2xl font-bold m-0">{title}</h2>
+      <div className="fixed inset-0 bg-[#0b2848]/65 backdrop-blur-sm z-[1000] flex items-center justify-center p-3 sm:p-8 animate-fadeIn" onClick={closeModal}>
+        <div className="bg-white rounded-2xl max-w-[760px] w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-2xl relative animate-slideUp text-left" onClick={e => e.stopPropagation()}>
+          <div className="sticky top-0 bg-[#1a4d8f] text-white p-4 sm:p-6 rounded-t-2xl flex items-center justify-between z-10">
+            <h2 className="font-heading text-xl sm:text-2xl font-bold m-0">{title}</h2>
             <button className="bg-white/10 border-none text-white w-8 h-8 rounded-full text-xl cursor-pointer flex items-center justify-center hover:bg-white/20 transition-colors" onClick={closeModal}>&times;</button>
           </div>
-          <div className="p-8 text-[#1a1a1a] leading-relaxed">
+          <div className="p-4 sm:p-8 text-[#1a1a1a] leading-relaxed">
             {children}
           </div>
         </div>
@@ -24,22 +25,22 @@ const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="bg-[#1a4d8f] text-white pt-16 pb-8 px-8 mt-auto">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-[1.5fr_1fr_1fr] gap-12 mb-16 max-md:grid-cols-1">
+      <footer className="bg-[#1a4d8f] text-white pt-12 sm:pt-16 pb-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.5fr_1fr_1fr] gap-8 lg:gap-12 mb-12 sm:mb-16">
           {/* COL 1 — Brand */}
           <div>
-            <div className="font-heading text-[2rem] font-extrabold mb-6 flex items-center gap-2">
-              <img src="/src/assets/logo.png" alt="Logo" className="h-10 w-auto" />
-              Examen Civique <span className="text-[#ff6b35]">Etrangers</span>
+            <div className="font-heading text-2xl sm:text-[2rem] font-extrabold mb-4 sm:mb-6 flex items-center gap-2">
+              <img src={logo} alt="Logo" className="h-10 w-auto" />
+              Examen Civique <span className="text-[#d72638]">Etrangers</span>
             </div>
-            <p className="text-white/80 text-[1.05rem] mb-6 leading-relaxed">
+            <p className="text-white/80 text-base sm:text-[1.05rem] mb-5 sm:mb-6 leading-relaxed">
               Examen Civique Etrangers est la <strong>plateforme n°1 de préparation à l'examen civique obligatoire</strong> en France.
               Depuis janvier 2026, cet examen est requis pour obtenir votre Carte de Séjour Pluriannuelle (CSP),
               Carte de Résident (10 ans) ou la Naturalisation française.<br/><br/>
               <strong>Notre mission :</strong> vous aider à réussir du premier coup avec 200+ questions officielles,
               examens blancs et fiches de révision adaptées aux 3 niveaux d'examen.
             </p>
-            <div className="inline-flex items-center gap-2 bg-white/10 py-2 px-4 rounded-full text-sm font-medium text-[#a5f3fc]">
+            <div className="inline-flex items-center gap-2 bg-white/10 py-2 px-4 rounded-full text-sm font-medium text-[#dbeafe]">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
               Conforme à la réglementation du 1er janvier 2026
             </div>
@@ -47,7 +48,7 @@ const Footer: React.FC = () => {
 
           {/* COL 2 — Navigation + Préparation */}
           <div>
-            <h3 className="font-heading text-xl font-bold text-[#ff6b35] mb-6 uppercase tracking-wider">Navigation</h3>
+            <h3 className="font-heading text-lg sm:text-xl font-bold text-[#d72638] mb-4 sm:mb-6 uppercase tracking-wider">Navigation</h3>
             <ul className="list-none p-0 m-0 space-y-3 mb-8">
               <li><button onClick={() => setActiveModal('modal-comment')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">Comment ça marche</button></li>
               <li><button onClick={() => setActiveModal('modal-tarifs')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">Tarifs</button></li>
@@ -57,9 +58,8 @@ const Footer: React.FC = () => {
 
             <div className="h-px bg-white/10 my-8 w-12"></div>
 
-            <h3 className="font-heading text-xl font-bold text-[#ff6b35] mb-6 uppercase tracking-wider">Préparation à l'examen</h3>
+            <h3 className="font-heading text-lg sm:text-xl font-bold text-[#d72638] mb-4 sm:mb-6 uppercase tracking-wider">Préparation à l'examen</h3>
             <ul className="list-none p-0 m-0 space-y-3">
-              <li><button onClick={() => setActiveModal('modal-test')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">🎯 Test gratuit (10 questions)</button></li>
               <li><button onClick={() => setActiveModal('modal-csp')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">📚 Guide complet CSP</button></li>
               <li><button onClick={() => setActiveModal('modal-cr')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">🏡 Guide Carte de Résident</button></li>
               <li><button onClick={() => setActiveModal('modal-naturalisation')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">🇫🇷 Guide Naturalisation</button></li>
@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
 
           {/* COL 3 — Légal */}
           <div>
-            <h3 className="font-heading text-xl font-bold text-[#ff6b35] mb-6 uppercase tracking-wider">Informations légales</h3>
+            <h3 className="font-heading text-lg sm:text-xl font-bold text-[#d72638] mb-4 sm:mb-6 uppercase tracking-wider">Informations légales</h3>
             <ul className="list-none p-0 m-0 space-y-3">
               <li><button onClick={() => setActiveModal('modal-mentions')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">⚖️ Mentions légales</button></li>
               <li><button onClick={() => setActiveModal('modal-cgv')} className="text-white/80 hover:text-white hover:translate-x-1 transition-all cursor-pointer bg-transparent border-none p-0 text-base">📜 Conditions Générales de Vente</button></li>
@@ -86,22 +86,22 @@ const Footer: React.FC = () => {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
                 Paiement sécurisé
               </div>
-              <div className="w-px h-4 bg-white/20"></div>
+              <div className="hidden sm:block w-px h-4 bg-white/20"></div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
                 SSL Certifié
               </div>
-              <div className="w-px h-4 bg-white/20"></div>
+              <div className="hidden sm:block w-px h-4 bg-white/20"></div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
                 Conforme RGPD
               </div>
-              <div className="w-px h-4 bg-white/20"></div>
+              <div className="hidden sm:block w-px h-4 bg-white/20"></div>
               <div className="flex items-center gap-2">
-                <span className="text-[#ffc107]">★★★★★</span>
+                <span className="text-[#d72638]">★★★★★</span>
                 4.9/5 (500+ avis)
               </div>
-              <div className="w-px h-4 bg-white/20"></div>
+              <div className="hidden sm:block w-px h-4 bg-white/20"></div>
               <div className="flex items-center gap-2">
                 © 2026 Examen Civique Etrangers
               </div>
@@ -151,7 +151,7 @@ const Footer: React.FC = () => {
       <Modal id="modal-tarifs" title="Tarifs">
         <p className="mb-6">Un tarif unique, transparent, sans abonnement ni frais cachés.</p>
         <div className="text-center my-8">
-          <div className="inline-block bg-[#2d6a4f] text-white text-3xl font-bold py-2 px-6 rounded-lg shadow-lg">20 €</div>
+          <div className="inline-block bg-[#1a4d8f] text-white text-3xl font-bold py-2 px-6 rounded-lg shadow-lg">20 €</div>
           <p className="mt-2 text-gray-600">Paiement unique — Accès illimité</p>
         </div>
         <h3 className="font-heading text-xl font-bold text-[#1a4d8f] mb-4">Ce que vous obtenez pour 20 €</h3>
@@ -176,22 +176,22 @@ const Footer: React.FC = () => {
         <p className="mb-6">Ils ont réussi leur examen civique grâce à Examen Civique Etrangers.</p>
         <div className="space-y-6">
           <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div className="text-[#ffc107] mb-2">★★★★★</div>
+            <div className="text-[#d72638] mb-2">★★★★★</div>
             <p className="italic mb-4">« J'ai obtenu 38/40 à mon examen CSP ! Les questions d'entraînement étaient très proches de celles du vrai test. Les fiches de révision m'ont beaucoup aidée à mémoriser les dates clés. »</p>
             <div className="font-bold text-[#1a4d8f]">Maria S. — CSP obtenue en mars 2026</div>
           </div>
           <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div className="text-[#ffc107] mb-2">★★★★★</div>
+            <div className="text-[#d72638] mb-2">★★★★★</div>
             <p className="italic mb-4">« Après 5 ans en France, je préparais ma naturalisation. Le niveau expert m'a permis de maîtriser les questions les plus difficiles sur les institutions et l'histoire. Résultat : 36/40. »</p>
             <div className="font-bold text-[#1a4d8f]">Ahmed K. — Naturalisation réussie en février 2026</div>
           </div>
           <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div className="text-[#ffc107] mb-2">★★★★★</div>
+            <div className="text-[#d72638] mb-2">★★★★★</div>
             <p className="italic mb-4">« J'avais très peur de l'examen, surtout les mises en situation. Les examens blancs m'ont mis en confiance. Le jour J, j'étais prête. 34/40 ! »</p>
             <div className="font-bold text-[#1a4d8f]">Fatou D. — Carte de Résident obtenue en janvier 2026</div>
           </div>
           <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div className="text-[#ffc107] mb-2">★★★★★</div>
+            <div className="text-[#d72638] mb-2">★★★★★</div>
             <p className="italic mb-4">« Le format est parfait : on peut réviser 15 minutes par jour depuis son téléphone. En 3 semaines, j'ai couvert toutes les thématiques. Je recommande à tous ceux qui préparent l'examen. »</p>
             <div className="font-bold text-[#1a4d8f]">Li W. — CSP obtenue en février 2026</div>
           </div>
@@ -262,7 +262,7 @@ const Footer: React.FC = () => {
               Netlify, Inc.<br/>
               2325 3rd Street, Suite 296<br/>
               San Francisco, CA 94107, USA<br/>
-              Site : <a href="https://www.netlify.com" className="text-[#ff6b35]">www.netlify.com</a>
+              Site : <a href="https://www.netlify.com" className="text-[#d72638]">www.netlify.com</a>
             </p>
           </div>
           <div>

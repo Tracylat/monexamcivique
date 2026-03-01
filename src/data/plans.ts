@@ -29,8 +29,8 @@ export const plans: PlanInfo[] = [
     price: 20,
     durationFr: 'Durée : 2 à 4 ans',
     durationEn: 'Duration: 2 to 4 years',
-    cardStyle: 'bg-white border-gray-200 hover:border-[#2d6a4f]',
-    buttonStyle: 'bg-[#2d6a4f] text-white hover:bg-[#1b4332]',
+    cardStyle: 'bg-white border-gray-200 hover:border-[#1a4d8f]',
+    buttonStyle: 'bg-[#1a4d8f] text-white hover:bg-[#0f3466]',
   },
   {
     id: 'Résident',
@@ -44,8 +44,8 @@ export const plans: PlanInfo[] = [
     price: 20,
     durationFr: 'Durée : 10 ans',
     durationEn: 'Duration: 10 years',
-    cardStyle: 'bg-gradient-to-br from-[#ff6b35] to-[#ff8f6b] text-white border-transparent',
-    buttonStyle: 'bg-white text-[#ff6b35] hover:bg-gray-100',
+    cardStyle: 'bg-gradient-to-br from-[#0f3466] to-[#1a4d8f] text-white border-transparent',
+    buttonStyle: 'bg-white text-[#d72638] hover:bg-[#fff5f6]',
   },
   {
     id: 'Naturalisation',
@@ -59,8 +59,8 @@ export const plans: PlanInfo[] = [
     price: 20,
     durationFr: 'Objectif : Citoyenneté française',
     durationEn: 'Goal: French citizenship',
-    cardStyle: 'bg-white border-gray-200 hover:border-[#1a4d8f]',
-    buttonStyle: 'bg-[#1a4d8f] text-white hover:bg-[#0f3466]',
+    cardStyle: 'bg-white border-gray-200 hover:border-[#d72638]',
+    buttonStyle: 'bg-[#d72638] text-white hover:bg-[#b91c2f]',
   },
 ];
 
@@ -76,4 +76,3 @@ export const normalizePlan = (value: string | null): TitleType => {
   if (plan === 'naturalisation' || plan === 'naturalization') return 'Naturalisation';
   return 'CSP';
 };
-

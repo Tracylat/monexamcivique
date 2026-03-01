@@ -5,8 +5,8 @@
 :root {
   --primary: #1a4d8f;
   --primary-dark: #0f3466;
-  --accent: #ff6b35;
-  --success: #2d6a4f;
+  --accent: #d72638;
+  --success: #1a4d8f;
   --danger: #d32f2f;
 }
 
@@ -14,7 +14,7 @@ body {
   font-family: 'Crimson Pro', serif;
   line-height: 1.6;
   color: #1a1a1a;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: linear-gradient(145deg, #f8fbff 0%, #eef4ff 55%, #fff7f8 100%);
   min-height: 100vh;
 }
 
@@ -36,14 +36,14 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), #ff8f6b);
+  background: linear-gradient(135deg, var(--accent), #ef4444);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 12px rgba(215, 38, 56, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 8px 20px rgba(215, 38, 56, 0.35);
 }
 
 .btn-primary:disabled {

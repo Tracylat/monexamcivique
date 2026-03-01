@@ -1,23 +1,43 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { isLoggedIn as hasAuthUser, logout, onAuthChanged } from '../utils/access';
 
 const Navbar: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [logged, setLogged] = React.useState(false);
 
   React.useEffect(() => {
-    setIsLoggedIn(Boolean(localStorage.getItem('auth_user')));
+    const updateLoggedState = () => setLogged(hasAuthUser());
+    updateLoggedState();
+    return onAuthChanged(updateLoggedState);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('auth_user');
+    logout();
     window.location.href = '/login';
   };
 
   return (
-    <nav style={{ padding: 16, background: '#eee', display: 'flex', gap: 16 }}>
-      <Link to="/">Accueil</Link>
-      {isLoggedIn ? <Link to="/dashboard">Dashboard</Link> : <Link to="/login">Connexion</Link>}
-      {isLoggedIn && <button onClick={handleLogout}>Déconnexion</button>}
+    <nav className="mx-auto mt-4 flex w-full max-w-[1100px] items-center justify-center gap-3 rounded-2xl border border-[#d7e3f4] bg-white px-4 py-3 shadow-[0_12px_30px_rgba(15,52,102,0.08)]">
+      <Link className="rounded-lg px-3 py-2 font-semibold text-[#1a4d8f] hover:bg-[#eef4ff]" to="/">
+        Accueil
+      </Link>
+      {logged ? (
+        <Link className="rounded-lg px-3 py-2 font-semibold text-[#1a4d8f] hover:bg-[#eef4ff]" to="/dashboard">
+          Dashboard
+        </Link>
+      ) : (
+        <Link className="rounded-lg px-3 py-2 font-semibold text-[#1a4d8f] hover:bg-[#eef4ff]" to="/login">
+          Connexion
+        </Link>
+      )}
+      {logged && (
+        <button
+          className="rounded-lg border border-[#f3d6d6] bg-white px-3 py-2 font-semibold text-[#b91c2f] hover:bg-[#fff5f5]"
+          onClick={handleLogout}
+        >
+          Déconnexion
+        </button>
+      )}
     </nav>
   );
 };

@@ -36,7 +36,7 @@ const UserSpacePage: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 via-indigo-50 to-slate-100 px-4 py-8 sm:py-12">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-100 to-white px-4 py-8 sm:py-12">
         <div className="mx-auto w-full max-w-6xl">
           <div className="mb-8 overflow-hidden rounded-3xl border border-[#d9e6fa] bg-white shadow-lg">
             <div className="grid grid-cols-1 gap-6 bg-[radial-gradient(circle_at_top_right,_rgba(26,77,143,0.12),_transparent_45%)] p-6 sm:p-8 lg:grid-cols-[1.3fr_1fr]">
@@ -123,7 +123,7 @@ const UserSpacePage: React.FC = () => {
                 <span className="font-semibold text-[#1a4d8f]">{profile.weeklyGoalMinutes} min objectif</span>
               </div>
               <div className="mb-5 h-3 rounded-full bg-slate-200">
-                <div className="h-3 rounded-full bg-[#2d6a4f]" style={{ width: `${goalProgress}%` }} />
+                <div className="h-3 rounded-full bg-[#d72638]" style={{ width: `${goalProgress}%` }} />
               </div>
               <div className="mb-4 grid grid-cols-7 gap-2">
                 {lastSevenDays.map((day) => (
@@ -189,7 +189,7 @@ const UserSpacePage: React.FC = () => {
                   <div key={plan.id} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
                     <div className="mb-3 flex items-center justify-between">
                       <span className="text-3xl">{plan.icon}</span>
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${isUnlocked ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${isUnlocked ? "bg-blue-100 text-[#1a4d8f]" : "bg-slate-100 text-slate-500"}`}>
                         {isUnlocked ? "Débloqué" : "Verrouillé"}
                       </span>
                     </div>
@@ -214,7 +214,7 @@ const UserSpacePage: React.FC = () => {
                               <strong>{exams}/3</strong>
                             </div>
                             <div className="h-2 rounded-full bg-slate-200">
-                              <div className="h-2 rounded-full bg-[#2d6a4f]" style={{ width: `${examsPercent}%` }} />
+                              <div className="h-2 rounded-full bg-[#d72638]" style={{ width: `${examsPercent}%` }} />
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-2 pt-1">

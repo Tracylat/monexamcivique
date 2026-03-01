@@ -22,8 +22,19 @@ const LandingPage: React.FC = () => {
       <nav className="nav">
         <div className="container nav-inner">
           <Link to="/" className="nav-logo">
-            <div className="h-[64px] w-[220px] sm:h-[80px] sm:w-[320px] lg:h-[96px] lg:w-[420px] overflow-hidden">
-              <img src={logo} alt="Logo Mon Examen Civique" style={{ height: '100%', width: '100%', objectFit: 'contain', objectPosition: 'left' }} />
+            <div className="h-[64px] w-[220px] sm:h-[104px] sm:w-[420px] lg:h-[124px] lg:w-[520px] overflow-hidden">
+              <img
+                src={logo}
+                alt="Logo Mon Examen Civique"
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  objectFit: 'contain',
+                  objectPosition: 'left',
+                  transform: 'scale(1.35)',
+                  transformOrigin: 'left center',
+                }}
+              />
             </div>
           </Link>
           <div className="nav-links">
@@ -44,8 +55,8 @@ const LandingPage: React.FC = () => {
             <p className="hero-sub">{t('landing.heroSubtitle')}</p>
             <div className="hero-stats">
               <div className="hero-stat"><div className="hs-i" style={{background:'#e3f2fd'}}>📚</div> {t('landing.statQuestions')}</div>
-              <div className="hero-stat"><div className="hs-i" style={{background:'#e8f5e9'}}>🎯</div> {t('landing.statSuccess')}</div>
-              <div className="hero-stat"><div className="hs-i" style={{background:'#fff3e0'}}>⏱️</div> {t('landing.statReady')}</div>
+              <div className="hero-stat"><div className="hs-i" style={{background:'#eef4ff'}}>🎯</div> {t('landing.statSuccess')}</div>
+              <div className="hero-stat"><div className="hs-i" style={{background:'#fff1f3'}}>⏱️</div> {t('landing.statReady')}</div>
             </div>
             <div className="hero-btns">
               <Link to="/app/free" className="btn-big">{t('landing.ctaStart')} →</Link>
@@ -225,28 +236,28 @@ const LandingPage: React.FC = () => {
             <div className="tem">
               <div className="tem-txt">{tr("J'ai obtenu 38/40 à mon examen ! Les mises en situation m'ont vraiment préparée aux questions pièges. Je recommande à 100 %.", "I got 38/40 in my exam! The scenarios really prepared me for tricky questions. 100% recommended.")}</div>
               <div className="tem-who">
-                <div className="tem-av" style={{background:'#42A5F5'}}>F</div>
+                <div className="tem-av" style={{background:'#1a4d8f'}}>F</div>
                 <div><div className="tem-name">Fatima B.</div><div className="tem-det">{tr('Naturalisation · Paris', 'Naturalization · Paris')}</div><div className="tem-stars">★★★★★</div></div>
               </div>
             </div>
             <div className="tem">
               <div className="tem-txt">{tr("Les examens blancs chronométrés sont géniaux. Le jour J, j'étais serein car j'avais déjà l'habitude du format et du stress du chrono.", "Timed mock exams are excellent. On exam day I was calm because I was already used to the format and time pressure.")}</div>
               <div className="tem-who">
-                <div className="tem-av" style={{background:'#66BB6A'}}>M</div>
+                <div className="tem-av" style={{background:'#0f3466'}}>M</div>
                 <div><div className="tem-name">Mohamed K.</div><div className="tem-det">{tr('Carte de Résident · Lyon', 'Resident Card · Lyon')}</div><div className="tem-stars">★★★★★</div></div>
               </div>
             </div>
             <div className="tem">
               <div className="tem-txt">{tr("J'avais raté une première fois sans préparation (180 € perdus). Avec Mon Examen Civique, j'ai eu 36/40. L'investissement de 20 € vaut largement le coup.", 'I failed a first time without preparation (EUR 180 lost). With My Civic Exam, I scored 36/40. The EUR 20 investment is clearly worth it.')}</div>
               <div className="tem-who">
-                <div className="tem-av" style={{background:'#FF9800'}}>L</div>
+                <div className="tem-av" style={{background:'#d72638'}}>L</div>
                 <div><div className="tem-name">Li Wei C.</div><div className="tem-det">{tr('CSP · Marseille', 'CSP · Marseille')}</div><div className="tem-stars">★★★★★</div></div>
               </div>
             </div>
             <div className="tem">
               <div className="tem-txt">{tr("Le parcours progressif est très motivant. Les explications après chaque question m'ont appris beaucoup sur la France en même temps.", 'The progressive path is very motivating. Explanations after each question taught me a lot about France.')}</div>
               <div className="tem-who">
-                <div className="tem-av" style={{background:'#AB47BC'}}>A</div>
+                <div className="tem-av" style={{background:'#b91c2f'}}>A</div>
                 <div><div className="tem-name">Amina D.</div><div className="tem-det">{tr('Naturalisation · Toulouse', 'Naturalization · Toulouse')}</div><div className="tem-stars">★★★★☆</div></div>
               </div>
             </div>

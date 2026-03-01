@@ -202,17 +202,17 @@ const FreePage: React.FC = () => {
             </div>
             <div className="bg-[rgba(255,255,255,0.2)] rounded-full h-3 max-w-[500px] mx-auto mt-8 overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-[#ff6b35] to-[#ff8f6b] rounded-full transition-all duration-400"
+                className="h-full bg-gradient-to-r from-[#d72638] to-[#ef4444] rounded-full transition-all duration-400"
                 style={{ width: `${((currentQuestionIndex) / 10) * 100}%` }}
               ></div>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl p-5 sm:p-10 shadow-[0_8px_24px_rgba(0,0,0,0.08)] mb-8">
-            <div className="font-heading text-[#ff6b35] font-bold text-base sm:text-lg mb-4 uppercase tracking-wider">
+            <div className="font-heading text-[#d72638] font-bold text-base sm:text-lg mb-4 uppercase tracking-wider">
               {tr('Question', 'Question')} {currentQuestionIndex + 1}/10
             </div>
-            <div className="font-heading text-2xl sm:text-[2rem] font-bold text-[#1a1a1a] mb-8 leading-tight">
+            <div className="font-heading text-2xl sm:text-2xl sm:text-4xl font-bold text-[#1a1a1a] mb-8 leading-tight">
               {currentQuestion?.q}
             </div>
             <div className="grid gap-4">
@@ -223,7 +223,7 @@ const FreePage: React.FC = () => {
                     ${
                       hasAnsweredCurrent
                         ? idx === currentQuestion.correct
-                          ? 'border-[#2d6a4f] bg-[#ecfdf3] text-[#14532d] shadow-md'
+                          ? 'border-[#1a4d8f] bg-[#eef4ff] text-[#0f3466] shadow-md'
                           : idx === selectedAnswerIndex
                             ? 'border-[#d32f2f] bg-[#fff1f2] text-[#7f1d1d] shadow-md'
                             : 'border-[#e2e8f0] bg-[#f8fafc] text-[#64748b]'
@@ -237,7 +237,7 @@ const FreePage: React.FC = () => {
                     ${
                       hasAnsweredCurrent
                         ? idx === currentQuestion.correct
-                          ? 'border-[#2d6a4f]'
+                          ? 'border-[#1a4d8f]'
                           : idx === selectedAnswerIndex
                             ? 'border-[#d32f2f]'
                             : 'border-[#cbd5e1]'
@@ -246,7 +246,7 @@ const FreePage: React.FC = () => {
                           : 'border-[#cbd5e1]'
                     }`}
                   >
-                    {hasAnsweredCurrent && idx === currentQuestion.correct && <div className="w-3 h-3 bg-[#2d6a4f] rounded-full"></div>}
+                    {hasAnsweredCurrent && idx === currentQuestion.correct && <div className="w-3 h-3 bg-[#1a4d8f] rounded-full"></div>}
                     {hasAnsweredCurrent && idx !== currentQuestion.correct && idx === selectedAnswerIndex && <div className="w-3 h-3 bg-[#d32f2f] rounded-full"></div>}
                     {!hasAnsweredCurrent && userAnswers[currentQuestionIndex] === idx && <div className="w-3 h-3 bg-[#1a4d8f] rounded-full"></div>}
                   </div>
@@ -258,10 +258,10 @@ const FreePage: React.FC = () => {
             {hasAnsweredCurrent && currentQuestion && (
               <div
                 className={`mt-6 rounded-xl border px-4 py-4 sm:px-5 sm:py-5 ${
-                  isCurrentCorrect ? 'border-[#bbf7d0] bg-[#f0fdf4]' : 'border-[#fecdd3] bg-[#fff1f2]'
+                  isCurrentCorrect ? 'border-[#bfdbfe] bg-[#eef4ff]' : 'border-[#fecdd3] bg-[#fff1f2]'
                 }`}
               >
-                <div className={`font-heading text-xl font-bold ${isCurrentCorrect ? 'text-[#166534]' : 'text-[#b91c1c]'}`}>
+                <div className={`font-heading text-xl font-bold ${isCurrentCorrect ? 'text-[#0f3466]' : 'text-[#b91c1c]'}`}>
                   {isCurrentCorrect
                     ? tr('✅ Bonne réponse', '✅ Correct answer')
                     : tr('❌ Mauvaise réponse', '❌ Wrong answer')}
@@ -293,35 +293,35 @@ const FreePage: React.FC = () => {
 
       {view === 'results' && (
         <div className="max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8">
-          <div className="bg-white rounded-2xl p-6 sm:p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-center max-w-[800px] mx-auto mb-8">
-            <h2 className="font-heading text-3xl sm:text-[2rem] text-gray-600">{tr('Votre score', 'Your score')}</h2>
-            <div className="font-heading text-[3.5rem] sm:text-[5rem] font-extrabold text-[#1a4d8f] my-4">{quizScore}/10</div>
+          <div className="bg-white rounded-2xl p-5 sm:p-8 lg:p-12 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-center max-w-[800px] mx-auto mb-8">
+            <h2 className="font-heading text-3xl sm:text-2xl sm:text-4xl text-gray-600">{tr('Votre score', 'Your score')}</h2>
+            <div className="font-heading text-5xl sm:text-7xl font-extrabold text-[#1a4d8f] my-4">{quizScore}/10</div>
             <div className={`font-bold text-xl uppercase tracking-wider mb-6 ${
-              quizScore >= 8 ? 'text-[#2d6a4f]' : quizScore >= 5 ? 'text-[#f59e0b]' : 'text-[#d32f2f]'
+              quizScore >= 8 ? 'text-[#1a4d8f]' : quizScore >= 5 ? 'text-[#0f3466]' : 'text-[#d32f2f]'
             }`}>
               {quizScore >= 8 ? tr('✅ BON NIVEAU', '✅ GOOD LEVEL') : quizScore >= 5 ? tr('⚠️ NIVEAU MOYEN', '⚠️ MEDIUM LEVEL') : tr('⚠️ NIVEAU INSUFFISANT', '⚠️ INSUFFICIENT LEVEL')}
             </div>
-            <p className="mt-6 text-[1.1rem] text-gray-600">{tr("Score minimum requis à l'examen officiel :", 'Minimum score required in official exam:')} <strong>32/40 (80%)</strong></p>
+            <p className="mt-6 text-base sm:text-lg text-gray-600">{tr("Score minimum requis à l'examen officiel :", 'Minimum score required in official exam:')} <strong>32/40 (80%)</strong></p>
           </div>
 
           <div className="bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] border-l-4 border-[#1a4d8f] rounded-xl p-5 sm:p-8 my-8 max-w-[800px] mx-auto">
             <h4 className="font-heading text-[#1a4d8f] text-2xl sm:text-[1.5rem] mb-4">💡 {tr('Vous voulez vraiment réussir ?', 'Do you really want to succeed?')}</h4>
-            <p className="text-base sm:text-[1.1rem] leading-relaxed mb-6">{tr("Débloquez l'accès complet avec 200+ questions de révision, 5 examens blancs et des fiches interactives.", 'Unlock full access with 200+ review questions, 5 mock exams and interactive cards.')}</p>
+            <p className="text-base sm:text-base sm:text-lg leading-relaxed mb-6">{tr("Débloquez l'accès complet avec 200+ questions de révision, 5 examens blancs et des fiches interactives.", 'Unlock full access with 200+ review questions, 5 mock exams and interactive cards.')}</p>
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-[#fee2e2]">
                 <div className="font-semibold text-[#d32f2f] mb-4">{tr("En cas d'échec", 'In case of failure')}</div>
-                <div className="text-[2rem] font-bold text-[#d32f2f] mb-2">225€+</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#d32f2f] mb-2">225€+</div>
                 <div className="text-sm text-gray-600">{tr("Nouveaux timbres fiscaux + 6 mois d'attente", 'New tax stamps + 6 months waiting')}</div>
               </div>
-              <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-[#d1fae5]">
-                <div className="font-semibold text-[#2d6a4f] mb-4">{tr('✓ Accès Complet', '✓ Full Access')}</div>
-                <div className="text-[2rem] font-bold text-[#2d6a4f] mb-2">20€</div>
+              <div className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-[#dbeafe]">
+                <div className="font-semibold text-[#1a4d8f] mb-4">{tr('✓ Accès Complet', '✓ Full Access')}</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#1a4d8f] mb-2">20€</div>
                 <div className="text-sm text-gray-600">{tr('Accès illimité • Garantie réussite', 'Unlimited access • Success guarantee')}</div>
               </div>
             </div>
           </div>
 
-          <div className="text-center mt-12 max-w-[800px] mx-auto">
+          <div className="text-center mt-10 sm:mt-12 max-w-[800px] mx-auto">
             <button 
               className="btn btn-primary mb-4" 
               onClick={() => navigate(`/checkout?plan=${encodeURIComponent(selectedTitle)}`)}

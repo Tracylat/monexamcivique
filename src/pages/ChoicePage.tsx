@@ -16,7 +16,7 @@ export default function ChoicePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 via-indigo-50 to-slate-100 px-4 py-8 sm:py-12">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-100 to-white px-4 py-8 sm:py-12">
         <div className="mx-auto w-full max-w-6xl">
           <div className="text-center mb-10 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl font-bold text-[#0f3466] mb-4">{tr('Bienvenue !', 'Welcome!')} 🎉</h1>
@@ -35,7 +35,7 @@ export default function ChoicePage() {
                   onClick={() => openCheckout(plan.id)}
                 >
                   {isResident && (
-                    <div className="mb-4 inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-bold text-[#ff6b35]">
+                    <div className="mb-4 inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-bold text-[#d72638]">
                       {tr('RECOMMANDÉ', 'RECOMMENDED')}
                     </div>
                   )}
