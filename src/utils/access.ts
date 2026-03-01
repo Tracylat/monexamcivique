@@ -1,6 +1,8 @@
 import { TitleType } from "../data/plans";
+import type { User } from "@supabase/supabase-js";
 
 const AUTH_KEY = "auth_user";
+const AUTH_CHANGED_EVENT = "auth-changed";
 const SELECTED_TITLE_KEY = "selected_title";
 const PURCHASED_PLANS_KEY = "purchased_plans";
 
@@ -17,6 +19,25 @@ export const isLoggedIn = (): boolean => Boolean(localStorage.getItem(AUTH_KEY))
 
 export const logout = (): void => {
   localStorage.removeItem(AUTH_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+};
+
+export const setAuthUserFromSupabaseUser = (user: User | null): void => {
+  if (!user) {
+    localStorage.removeItem(AUTH_KEY);
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+    return;
+  }
+
+  localStorage.setItem(
+    AUTH_KEY,
+    JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Utilisateur",
+    }),
+  );
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 };
 
 export const getSelectedPlan = (): TitleType | null => {
