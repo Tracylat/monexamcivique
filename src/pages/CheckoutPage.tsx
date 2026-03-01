@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,12 @@ import { normalizePlan, planMap, plans } from "../data/plans";
 import { addPurchasedPlan, setSelectedPlan } from "../utils/access";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || "").replace(/\/$/, "");
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_FUNCTIONS_URL =
+  (import.meta.env.VITE_SUPABASE_FUNCTIONS_URL || "").replace(/\/$/, "") ||
+  (SUPABASE_URL ? `${SUPABASE_URL}/functions/v1` : "");
+const USE_SUPABASE_FUNCTIONS = Boolean(SUPABASE_FUNCTIONS_URL);
 
 const CheckoutForm = () => {
   const { i18n } = useTranslation();
@@ -23,9 +29,34 @@ const CheckoutForm = () => {
   const selectedPlanInfo = planMap[selectedPlan];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [backendReady, setBackendReady] = useState<boolean | null>(null);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const stripeKeyMissing = !STRIPE_PUBLIC_KEY;
+  const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+  useEffect(() => {
+    let mounted = true;
+    const checkBackend = async () => {
+      if (USE_SUPABASE_FUNCTIONS) {
+        if (!mounted) return;
+        setBackendReady(Boolean(SUPABASE_URL && SUPABASE_ANON_KEY));
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/health`, { method: "GET" });
+        if (!mounted) return;
+        setBackendReady(res.ok);
+      } catch {
+        if (!mounted) return;
+        setBackendReady(false);
+      }
+    };
+    void checkBackend();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,19 +76,40 @@ const CheckoutForm = () => {
       return;
     }
 
+    if (!USE_SUPABASE_FUNCTIONS && !isLocalHost && /localhost|127\.0\.0\.1/.test(API_BASE_URL)) {
+      setError(
+        tr(
+          `Configuration invalide: VITE_API_URL pointe vers ${API_BASE_URL}. En production, utilisez l'URL publique de votre backend (Render/Railway).`,
+          `Invalid config: VITE_API_URL points to ${API_BASE_URL}. In production, use your public backend URL (Render/Railway).`,
+        ),
+      );
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
+      const paymentEndpoint = USE_SUPABASE_FUNCTIONS
+        ? `${SUPABASE_FUNCTIONS_URL}/create-payment-intent`
+        : `${API_BASE_URL}/api/payment/create-intent`;
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (USE_SUPABASE_FUNCTIONS) {
+        headers.apikey = SUPABASE_ANON_KEY;
+        headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
+      }
+
       // Créer le PaymentIntent côté serveur
-      const response = await fetch(`${API_BASE_URL}/api/payment/create-intent`, {
+      const response = await fetch(paymentEndpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           email,
           name,
           amount: selectedPlanInfo.price * 100,
           currency: "eur",
+          plan: selectedPlan,
         }),
       });
 
@@ -96,7 +148,21 @@ const CheckoutForm = () => {
         setError(tr("Le paiement n'a pas abouti", 'Payment did not complete'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : tr('Erreur lors du paiement', 'Payment error'));
+      const msg = err instanceof Error ? err.message : "";
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        setError(
+          tr(
+            USE_SUPABASE_FUNCTIONS
+              ? `Impossible de joindre Supabase Functions (${SUPABASE_FUNCTIONS_URL}). Vérifiez le déploiement de la fonction create-payment-intent.`
+              : `Impossible de joindre le backend de paiement (${API_BASE_URL}). Vérifiez VITE_API_URL et que le backend est démarré.`,
+            USE_SUPABASE_FUNCTIONS
+              ? `Unable to reach Supabase Functions (${SUPABASE_FUNCTIONS_URL}). Check deployment of create-payment-intent function.`
+              : `Unable to reach payment backend (${API_BASE_URL}). Check VITE_API_URL and ensure backend is running.`,
+          ),
+        );
+      } else {
+        setError(msg || tr('Erreur lors du paiement', 'Payment error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -148,6 +214,21 @@ const CheckoutForm = () => {
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-700">
                 {tr("Configuration Stripe incomplète : ajoutez VITE_STRIPE_PUBLIC_KEY dans .env", "Incomplete Stripe config: add VITE_STRIPE_PUBLIC_KEY in .env")}
+              </p>
+            </div>
+          )}
+
+          {backendReady === false && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">
+                {tr(
+                  USE_SUPABASE_FUNCTIONS
+                    ? `Supabase Functions non configuré: vérifiez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.`
+                    : `Backend paiement non joignable: ${API_BASE_URL}.`,
+                  USE_SUPABASE_FUNCTIONS
+                    ? `Supabase Functions not configured: check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.`
+                    : `Payment backend unreachable: ${API_BASE_URL}.`,
+                )}
               </p>
             </div>
           )}
