@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { TitleType, plans } from '../data/plans';
+import { enableDemoAccess } from '../utils/access';
 
 export default function ChoicePage() {
   const navigate = useNavigate();
@@ -23,6 +24,16 @@ export default function ChoicePage() {
             <p className="text-base sm:text-xl text-gray-600">
               {tr('Choisissez votre formation complète selon votre objectif', 'Choose your complete training according to your goal')}
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                enableDemoAccess();
+                navigate('/choice');
+              }}
+              className="mt-4 rounded-lg border border-[#d7e3f4] bg-white px-4 py-2 text-sm font-semibold text-[#1a4d8f] hover:bg-[#eef4fb]"
+            >
+              {tr('Activer le mode test (sans connexion)', 'Enable test mode (no login)')}
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-7">

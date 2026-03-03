@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { API_BASE_URL } from '../config/stripe';
 
 const DashboardPage: React.FC = () => {
   const { i18n } = useTranslation();
@@ -14,7 +13,8 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const urls = [`${API_BASE_URL}/api/quiz`, `${API_BASE_URL}/quiz`];
+        const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001').replace(/\/$/, '');
+        const urls = [`${apiBaseUrl}/api/quiz`, `${apiBaseUrl}/quiz`];
 
         for (const url of urls) {
           const response = await fetch(url);

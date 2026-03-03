@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import logo from '../assets/logo.png';
 import Footer from '../components/Footer';
+import { enableDemoAccess } from '../utils/access';
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isEn = i18n.resolvedLanguage === 'en';
   const tr = (fr: string, en: string) => (isEn ? en : fr);
@@ -41,7 +43,7 @@ const LandingPage: React.FC = () => {
             <a href="#parcours">{t('nav.parcours')}</a>
             <a href="#niveaux">{t('nav.niveaux')}</a>
             <a href="#faq">{t('nav.faq')}</a>
-            <a href="#tarifs" className="btn-cta">{t('nav.start')}</a>
+ 
             <LanguageSwitcher />
           </div>
         </div>
@@ -61,6 +63,16 @@ const LandingPage: React.FC = () => {
             <div className="hero-btns">
               <Link to="/app/free" className="btn-big">{t('landing.ctaStart')} →</Link>
               <a href="#parcours" className="btn-ghost">{t('landing.ctaPath')}</a>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  enableDemoAccess();
+                  navigate('/choice');
+                }}
+              >
+                {tr('Mode test (parcours client)', 'Test mode (client flow)')}
+              </button>
             </div>
           </div>
         </div>

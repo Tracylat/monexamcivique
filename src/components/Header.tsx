@@ -3,17 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import logo from '../assets/logo.png';
-import { isLoggedIn, logout, onAuthChanged } from '../utils/access';
+import { disableDemoAccess, enableDemoAccess, isDemoAccessEnabled, isLoggedIn, logout } from '../utils/access';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [logged, setLogged] = useState(false);
+  const [demo, setDemo] = useState(false);
 
   useEffect(() => {
-    const updateLoggedState = () => setLogged(isLoggedIn());
+    const updateLoggedState = () => {
+      setLogged(isLoggedIn());
+      setDemo(isDemoAccessEnabled());
+    };
     updateLoggedState();
-    return onAuthChanged(updateLoggedState);
+    window.addEventListener('auth-changed', updateLoggedState);
+    window.addEventListener('storage', updateLoggedState);
+    return () => {
+      window.removeEventListener('auth-changed', updateLoggedState);
+      window.removeEventListener('storage', updateLoggedState);
+    };
   }, []);
 
   return (
@@ -55,6 +64,26 @@ const Header: React.FC = () => {
               </button>
             </>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              if (demo) {
+                disableDemoAccess();
+                navigate('/');
+                return;
+              }
+              enableDemoAccess();
+              navigate('/choice');
+            }}
+            className={`rounded-lg border px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-sm font-semibold ${
+              demo
+                ? 'border-[#f3d6d6] bg-[#fff5f5] text-[#b42318] hover:bg-[#ffe9ea]'
+                : 'border-[#d7e3f4] bg-white text-[#1a4d8f] hover:bg-[#eef4fb]'
+            }`}
+            title={demo ? 'Désactiver le mode test' : 'Activer le mode test'}
+          >
+            {demo ? 'Mode test actif' : 'Mode test'}
+          </button>
           <LanguageSwitcher />
         </div>
       </div>

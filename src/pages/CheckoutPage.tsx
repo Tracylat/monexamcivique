@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { STRIPE_PUBLIC_KEY, API_BASE_URL } from "../config/stripe";
 import Header from "../components/Header";
 import { normalizePlan, planMap, plans } from "../data/plans";
-import { addPurchasedPlan, setSelectedPlan } from "../utils/access";
+import { addPurchasedPlan, enableDemoAccess, setSelectedPlan } from "../utils/access";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || "").replace(/\/$/, "");
@@ -169,11 +169,25 @@ const CheckoutForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-indigo-50 to-slate-100 px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-blue-100 to-white px-4 py-8 sm:py-12">
       <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-6 lg:grid-cols-[1.05fr_1fr]">
         <div className="rounded-2xl bg-white p-5 shadow-xl sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">{tr('Paiement sécurisé', 'Secure payment')}</h1>
           <p className="text-center text-sm sm:text-base text-gray-600 mb-7">{tr('Accès illimité à Mon Examen Civique', 'Unlimited access to My Civic Exam')}</p>
+          <div className="mb-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                enableDemoAccess();
+                addPurchasedPlan(selectedPlan);
+                setSelectedPlan(selectedPlan);
+                navigate("/app");
+              }}
+              className="rounded-lg border border-[#d7e3f4] bg-white px-4 py-2 text-sm font-semibold text-[#1a4d8f] hover:bg-[#eef4fb]"
+            >
+              {tr("Bouton test: continuer sans paiement", "Test button: continue without payment")}
+            </button>
+          </div>
 
           <div className="mb-6">
             <p className="mb-3 text-sm font-semibold text-gray-700">{tr('Choisir la formation', 'Choose training')}</p>
@@ -195,12 +209,12 @@ const CheckoutForm = () => {
             </div>
           </div>
 
-          <div className="mb-8 p-5 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+          <div className="mb-8 p-5 sm:p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
             <div className="flex justify-between items-center mb-4 gap-2">
               <span className="text-gray-700 font-semibold text-sm sm:text-base">
                 {tr('Formation choisie', 'Selected training')}: {selectedPlan}
               </span>
-              <span className="text-2xl sm:text-3xl font-bold text-indigo-600">{selectedPlanInfo.price}€</span>
+              <span className="text-2xl sm:text-3xl font-bold text-[#1a4d8f]">{selectedPlanInfo.price}€</span>
             </div>
             <div className="text-sm text-gray-600 space-y-2">
               {selectedPlanInfo.featuresFr.slice(0, 3).map((featureFr, index) => (
@@ -219,8 +233,8 @@ const CheckoutForm = () => {
           )}
 
           {backendReady === false && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
                 {tr(
                   USE_SUPABASE_FUNCTIONS
                     ? `Supabase Functions non configuré: vérifiez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.`
@@ -242,7 +256,7 @@ const CheckoutForm = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={tr('Jean Dupont', 'John Doe')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             />
           </div>
@@ -256,7 +270,7 @@ const CheckoutForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={tr('votre@email.com', 'your@email.com')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             />
           </div>
@@ -293,7 +307,7 @@ const CheckoutForm = () => {
             <button
               type="submit"
               disabled={loading || !stripe || stripeKeyMissing}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#1a4d8f] text-white py-3 rounded-lg font-semibold hover:bg-[#0f3466] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? tr('Traitement...', 'Processing...') : tr(`Payer ${selectedPlanInfo.price}€`, `Pay EUR ${selectedPlanInfo.price}`)}
             </button>

@@ -16,10 +16,15 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
+    const configuredOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const allowedOrigins = new Set(configuredOrigins);
     const isLocalhost = typeof origin === 'string' && /^https?:\/\/localhost:\d+$/.test(origin);
+    const isVercelPreview = typeof origin === 'string' && origin.endsWith('.vercel.app');
 
-    if (!origin || allowedOrigins.includes(origin) || isLocalhost) {
+    if (!origin || allowedOrigins.has(origin) || isLocalhost || isVercelPreview) {
       callback(null, true);
       return;
     }

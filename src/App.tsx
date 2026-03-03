@@ -10,7 +10,7 @@ import LoginPage from './pages/LoginPage';
 import { supabase } from './lib/supabase';
 import { PaymentProvider } from './context/PaymentContext';
 import UserSpacePage from './pages/UserSpacePage';
-import { getPurchasedPlans, isLoggedIn, setAuthUserFromSupabaseUser } from './utils/access';
+import { getPurchasedPlans, isDemoAccessEnabled, isLoggedIn, setAuthUserFromSupabaseUser } from './utils/access';
 
 type ProtectedRouteProps = {
   element: ReactElement;
@@ -18,6 +18,9 @@ type ProtectedRouteProps = {
 
 function RequireAuth({ element }: ProtectedRouteProps) {
   const location = useLocation();
+  if (isDemoAccessEnabled()) {
+    return element;
+  }
   if (!isLoggedIn()) {
     const next = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/login?next=${next}`} replace />;
@@ -31,6 +34,22 @@ function RequirePaidPlan({ element }: ProtectedRouteProps) {
     return <Navigate to="/choice" replace />;
   }
   return element;
+}
+
+function ScrollToTop() {
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [location.pathname, location.search, location.hash]);
+  return null;
 }
 
 function App() {
@@ -65,6 +84,7 @@ function App() {
   return (
     <PaymentProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />

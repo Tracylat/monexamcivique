@@ -1,10 +1,12 @@
-import { TitleType } from "../data/plans";
 import type { User } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
+import { TitleType } from "../data/plans";
 
 const AUTH_KEY = "auth_user";
 const AUTH_CHANGED_EVENT = "auth-changed";
 const SELECTED_TITLE_KEY = "selected_title";
 const PURCHASED_PLANS_KEY = "purchased_plans";
+const DEMO_ACCESS_KEY = "demo_access_enabled";
 
 const safeJsonParse = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback;
@@ -17,9 +19,35 @@ const safeJsonParse = <T>(value: string | null, fallback: T): T => {
 
 export const isLoggedIn = (): boolean => Boolean(localStorage.getItem(AUTH_KEY));
 
+export const isDemoAccessEnabled = (): boolean => {
+  if (import.meta.env.VITE_DEMO_ACCESS === "true") return true;
+  return localStorage.getItem(DEMO_ACCESS_KEY) === "1";
+};
+
+export const enableDemoAccess = (): void => {
+  localStorage.setItem(DEMO_ACCESS_KEY, "1");
+  localStorage.setItem(
+    AUTH_KEY,
+    JSON.stringify({
+      id: "demo-user",
+      email: "demo@monexamencivique.local",
+      name: "Démo Client",
+    }),
+  );
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+};
+
+export const disableDemoAccess = (): void => {
+  localStorage.removeItem(DEMO_ACCESS_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+};
+
 export const logout = (): void => {
   localStorage.removeItem(AUTH_KEY);
   window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+  if (supabase) {
+    void supabase.auth.signOut();
+  }
 };
 
 export const setAuthUserFromSupabaseUser = (user: User | null): void => {
@@ -38,6 +66,15 @@ export const setAuthUserFromSupabaseUser = (user: User | null): void => {
     }),
   );
   window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+};
+
+export const onAuthChanged = (listener: () => void): (() => void) => {
+  window.addEventListener(AUTH_CHANGED_EVENT, listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    window.removeEventListener(AUTH_CHANGED_EVENT, listener);
+    window.removeEventListener("storage", listener);
+  };
 };
 
 export const getSelectedPlan = (): TitleType | null => {
