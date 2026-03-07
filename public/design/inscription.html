@@ -132,7 +132,7 @@ h1,h2,h3,.dg{font-family:'Darker Grotesque',sans-serif}
       </div>
     </div>
     <div class="card-nav">
-      <a href="index.html" class="nav-btn nav-back" style="text-decoration:none;text-align:center">← Retour</a>
+      <a href="/" target="_top" class="nav-btn nav-back" style="text-decoration:none;text-align:center">← Retour</a>
       <button class="nav-btn nav-next" id="n1" disabled onclick="goStep(2)">Continuer →</button>
     </div>
   </div>
@@ -253,13 +253,15 @@ function checkForm(){
 }
 
 function pay(){
-  // In production: redirect to Stripe payment link with titre parameter
-  // For now: simulate and redirect to app
-  var url='app.html?titre='+chosenTitle;
-  // In real implementation:
-  // window.location.href = 'https://buy.stripe.com/YOUR_LINK?client_reference_id=' + chosenTitle;
-  window.location.href=url;
+  // Redirect to functional checkout page with selected plan.
+  window.top.location.href='/checkout?plan='+encodeURIComponent(chosenTitle||'CR');
 }
+</script>
+<script>
+function getSavedLang(){try{return localStorage.getItem('site_lang')||'fr';}catch(e){return 'fr';}}
+const D={en:{"Choisissez votre préparation":"Choose your preparation","Créez votre compte":"Create your account","Finalisez votre inscription":"Complete your registration","Continuer →":"Continue →","← Retour":"← Back","Payer 20 € et commencer →":"Pay EUR 20 and start →"},es:{"Choisissez votre préparation":"Elige tu preparación","Créez votre compte":"Crea tu cuenta","Finalisez votre inscription":"Finaliza tu inscripción","Continuer →":"Continuar →","← Retour":"← Volver","Payer 20 € et commencer →":"Pagar 20 € y empezar →"},ar:{"Choisissez votre préparation":"اختر تحضيرك","Créez votre compte":"أنشئ حسابك","Finalisez votre inscription":"أكمل التسجيل","Continuer →":"متابعة →","← Retour":"← رجوع","Payer 20 € et commencer →":"ادفع 20€ وابدأ →"},pt:{"Choisissez votre préparation":"Escolha sua preparação","Créez votre compte":"Crie sua conta","Finalisez votre inscription":"Finalize sua inscrição","Continuer →":"Continuar →","← Retour":"← Voltar","Payer 20 € et commencer →":"Pagar 20€ e começar →"},zh:{"Choisissez votre préparation":"选择你的备考方案","Créez votre compte":"创建账号","Finalisez votre inscription":"完成注册","Continuer →":"继续 →","← Retour":"← 返回","Payer 20 € et commencer →":"支付20欧并开始 →"}};
+function applyLang(lang){document.documentElement.lang=lang;document.documentElement.dir=(lang==='ar'?'rtl':'ltr');if(lang==='fr')return;var map=D[lang]||{};var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(node){var p=node.parentElement;if(!p)return 2;var t=p.tagName;return (t==='SCRIPT'||t==='STYLE'||t==='NOSCRIPT')?2:1;}});var a=[],n;while((n=walker.nextNode()))a.push(n);a.forEach(function(node){var txt=node.nodeValue;Object.keys(map).forEach(function(fr){txt=txt.split(fr).join(map[fr]);});node.nodeValue=txt;});}
+document.addEventListener('DOMContentLoaded',function(){applyLang(getSavedLang());});
 </script>
 </body>
 </html>

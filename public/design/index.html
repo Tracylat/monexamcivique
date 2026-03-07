@@ -249,7 +249,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
         <div class="hero-stat"><div class="hs-i" style="background:var(--vert-l)">🎯</div> 97 % de réussite</div>
         <div class="hero-stat"><div class="hs-i" style="background:var(--orange-l)">⏱️</div> Prêt en 3 semaines</div>
       </div>
-      <a href="test.html" class="btn-test">
+      <a href="/app/free" target="_top" class="btn-test">
         Tester mon niveau gratuitement →
         <span class="btn-test-sub">10 questions pour évaluer vos connaissances</span>
       </a>
@@ -306,7 +306,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
           <div class="niv-div"></div>
         </div>
         <div class="niv-result"><div class="niv-result-t">🎓 → « Vous êtes prêt ! »</div></div>
-        <a href="test.html" class="niv-btn dg">Tester mon niveau →</a>
+        <a href="/app/free" target="_top" class="niv-btn dg">Tester mon niveau →</a>
       </div>
       <div class="niv pop">
         <div class="niv-head"><div class="niv-icon">🏡</div><div class="niv-name dg">Carte de Résident</div><div class="niv-level">Niveau Avancé · ⭐⭐⭐</div></div>
@@ -317,7 +317,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
           <div class="niv-div"></div>
         </div>
         <div class="niv-result"><div class="niv-result-t">🎓 → « Vous êtes prêt ! »</div></div>
-        <a href="test.html" class="niv-btn dg">Tester mon niveau →</a>
+        <a href="/app/free" target="_top" class="niv-btn dg">Tester mon niveau →</a>
       </div>
       <div class="niv">
         <div class="niv-head"><div class="niv-icon">🇫🇷</div><div class="niv-name dg">Naturalisation</div><div class="niv-level">Niveau Expert · ⭐⭐⭐⭐</div></div>
@@ -328,7 +328,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
           <div class="niv-div"></div>
         </div>
         <div class="niv-result"><div class="niv-result-t">🎓 → « Vous êtes prêt ! »</div></div>
-        <a href="test.html" class="niv-btn dg">Tester mon niveau →</a>
+        <a href="/app/free" target="_top" class="niv-btn dg">Tester mon niveau →</a>
       </div>
     </div>
   </div>
@@ -349,7 +349,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
           <div class="tarif-i">Bilan par thème</div><div class="tarif-i">Certificat « Prêt »</div>
           <div class="tarif-i">Mises à jour gratuites</div><div class="tarif-i">100 % mobile</div>
         </div>
-        <a href="test.html" class="btn-test" style="width:100%;justify-content:center;font-size:1.2rem;padding:16px 0;display:flex">Tester mon niveau gratuitement →</a>
+        <a href="/app/free" target="_top" class="btn-test" style="width:100%;justify-content:center;font-size:1.2rem;padding:16px 0;display:flex">Tester mon niveau gratuitement →</a>
       </div>
       <div class="tarif-cmp">
         <h4 class="dg">💡 Comparez le coût d'un échec</h4>
@@ -399,7 +399,7 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
   <div class="container">
     <h2 class="cta-t dg">Êtes-vous prêt pour l'examen civique ?</h2>
     <p class="cta-s">Faites le test gratuit et découvrez votre niveau en 5 minutes</p>
-    <a href="test.html" class="cta-btn">Tester mon niveau gratuitement →</a>
+    <a href="/app/free" target="_top" class="cta-btn">Tester mon niveau gratuitement →</a>
     <p class="cta-g">🎯 10 questions · 5 minutes · 100 % gratuit</p>
   </div>
 </section>
@@ -530,12 +530,12 @@ San Francisco, CA, USA
 
 <h3 style="margin-top:2rem;margin-bottom:1rem">Langues disponibles</h3>
 <div class="footer-languages">
-<div class="footer-lang-btn active">🇫🇷 FR</div>
-<div class="footer-lang-btn">🇬🇧 EN</div>
-<div class="footer-lang-btn">🇪🇸 ES</div>
-<div class="footer-lang-btn">🇸🇦 AR</div>
-<div class="footer-lang-btn">🇵🇹 PT</div>
-<div class="footer-lang-btn">🇨🇳 ZH</div>
+<button type="button" class="footer-lang-btn active" data-lang="fr" onclick="setSiteLanguage('fr')">🇫🇷 FR</button>
+<button type="button" class="footer-lang-btn" data-lang="en" onclick="setSiteLanguage('en')">🇬🇧 EN</button>
+<button type="button" class="footer-lang-btn" data-lang="es" onclick="setSiteLanguage('es')">🇪🇸 ES</button>
+<button type="button" class="footer-lang-btn" data-lang="ar" onclick="setSiteLanguage('ar')">🇸🇦 AR</button>
+<button type="button" class="footer-lang-btn" data-lang="pt" onclick="setSiteLanguage('pt')">🇵🇹 PT</button>
+<button type="button" class="footer-lang-btn" data-lang="zh" onclick="setSiteLanguage('zh')">🇨🇳 ZH</button>
 </div>
 <p style="font-size:.8rem;opacity:.6;margin-top:.5rem">⚠️ L'examen reste en français (langue officielle)</p>
 </div>
@@ -606,5 +606,131 @@ Satisfait ou remboursé
 </div>
 </footer>
 
+<script>
+function getSavedLang(){try{return localStorage.getItem('site_lang')||'fr';}catch(e){return 'fr';}}
+function saveLang(lang){try{localStorage.setItem('site_lang',lang);}catch(e){}}
+function markActiveLang(lang){
+  document.querySelectorAll('.footer-lang-btn').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-lang')===lang);
+  });
+}
+function setSiteLanguage(lang){saveLang(lang);window.location.reload();}
+const I18N={
+  en:{
+    "Comment ça marche":"How it works",
+    "Niveaux":"Levels",
+    "Questions fréquentes":"FAQ",
+    "Réussissez votre":"Pass your",
+    "examen civique":"civic exam",
+    "du premier coup":"on the first try",
+    "Tester mon niveau gratuitement":"Test my level for free",
+    "Tester mon niveau":"Test my level",
+    "Choisissez votre préparation":"Choose your preparation",
+    "Un parcours complet adapté à votre titre de séjour":"A complete path adapted to your permit type",
+    "Un investissement qui vous protège":"An investment that protects you",
+    "Paiement unique · Accès illimité · Pas d'abonnement":"One-time payment · Unlimited access · No subscription",
+    "Questions fréquentes":"Frequently asked questions",
+    "Êtes-vous prêt pour l'examen civique ?":"Are you ready for the civic exam?",
+    "10 questions pour évaluer vos connaissances":"10 questions to assess your knowledge",
+    "© 2026 Mon Examen Civique - Tous droits réservés":"© 2026 Mon Examen Civique - All rights reserved"
+  },
+  es:{
+    "Comment ça marche":"Cómo funciona",
+    "Niveaux":"Niveles",
+    "Questions fréquentes":"Preguntas frecuentes",
+    "Réussissez votre":"Aprueba tu",
+    "examen civique":"examen cívico",
+    "du premier coup":"a la primera",
+    "Tester mon niveau gratuitement":"Probar mi nivel gratis",
+    "Tester mon niveau":"Probar mi nivel",
+    "Choisissez votre préparation":"Elige tu preparación",
+    "Un parcours complet adapté à votre titre de séjour":"Un recorrido completo adaptado a tu permiso",
+    "Un investissement qui vous protège":"Una inversión que te protege",
+    "Paiement unique · Accès illimité · Pas d'abonnement":"Pago único · Acceso ilimitado · Sin suscripción",
+    "Questions fréquentes":"Preguntas frecuentes",
+    "Êtes-vous prêt pour l'examen civique ?":"¿Estás listo para el examen cívico?",
+    "10 questions pour évaluer vos connaissances":"10 preguntas para evaluar tu nivel",
+    "© 2026 Mon Examen Civique - Tous droits réservés":"© 2026 Mon Examen Civique - Todos los derechos reservados"
+  },
+  ar:{
+    "Comment ça marche":"كيف يعمل",
+    "Niveaux":"المستويات",
+    "Questions fréquentes":"الأسئلة الشائعة",
+    "Réussissez votre":"انجح في",
+    "examen civique":"الامتحان المدني",
+    "du premier coup":"من أول مرة",
+    "Tester mon niveau gratuitement":"اختبر مستواي مجانًا",
+    "Tester mon niveau":"اختبر مستواي",
+    "Choisissez votre préparation":"اختر إعدادك",
+    "Un parcours complet adapté à votre titre de séjour":"مسار كامل مناسب لوضع إقامتك",
+    "Un investissement qui vous protège":"استثمار يحميك",
+    "Paiement unique · Accès illimité · Pas d'abonnement":"دفع مرة واحدة · وصول غير محدود · بلا اشتراك",
+    "Questions fréquentes":"الأسئلة الشائعة",
+    "Êtes-vous prêt pour l'examen civique ?":"هل أنت مستعد للامتحان المدني؟",
+    "10 questions pour évaluer vos connaissances":"10 أسئلة لتقييم مستواك",
+    "© 2026 Mon Examen Civique - Tous droits réservés":"© 2026 مون إكزامان سيفيك - جميع الحقوق محفوظة"
+  },
+  pt:{
+    "Comment ça marche":"Como funciona",
+    "Niveaux":"Níveis",
+    "Questions fréquentes":"Perguntas frequentes",
+    "Réussissez votre":"Passe no seu",
+    "examen civique":"exame cívico",
+    "du premier coup":"na primeira tentativa",
+    "Tester mon niveau gratuitement":"Testar meu nível grátis",
+    "Tester mon niveau":"Testar meu nível",
+    "Choisissez votre préparation":"Escolha sua preparação",
+    "Un parcours complet adapté à votre titre de séjour":"Percurso completo adaptado ao seu título",
+    "Un investissement qui vous protège":"Um investimento que protege você",
+    "Paiement unique · Accès illimité · Pas d'abonnement":"Pagamento único · Acesso ilimitado · Sem assinatura",
+    "Questions fréquentes":"Perguntas frequentes",
+    "Êtes-vous prêt pour l'examen civique ?":"Você está pronto para o exame cívico?",
+    "10 questions pour évaluer vos connaissances":"10 perguntas para avaliar seu nível",
+    "© 2026 Mon Examen Civique - Tous droits réservés":"© 2026 Mon Examen Civique - Todos os direitos reservados"
+  },
+  zh:{
+    "Comment ça marche":"如何运作",
+    "Niveaux":"级别",
+    "Questions fréquentes":"常见问题",
+    "Réussissez votre":"通过你的",
+    "examen civique":"公民考试",
+    "du premier coup":"一次通过",
+    "Tester mon niveau gratuitement":"免费测试我的水平",
+    "Tester mon niveau":"测试我的水平",
+    "Choisissez votre préparation":"选择你的备考方案",
+    "Un parcours complet adapté à votre titre de séjour":"适合你居留类型的完整学习路径",
+    "Un investissement qui vous protège":"保护你的投资",
+    "Paiement unique · Accès illimité · Pas d'abonnement":"一次性付款 · 无限访问 · 无订阅",
+    "Questions fréquentes":"常见问题",
+    "Êtes-vous prêt pour l'examen civique ?":"你准备好参加公民考试了吗？",
+    "10 questions pour évaluer vos connaissances":"10道题评估你的水平",
+    "© 2026 Mon Examen Civique - Tous droits réservés":"© 2026 Mon Examen Civique - 版权所有"
+  }
+};
+function applyLocalI18n(lang){
+  markActiveLang(lang);
+  document.documentElement.lang=lang;
+  document.documentElement.dir=(lang==='ar'?'rtl':'ltr');
+  if(lang==='fr')return;
+  var dict=I18N[lang]||{};
+  var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+    acceptNode:function(node){
+      var p=node.parentElement;
+      if(!p)return NodeFilter.FILTER_REJECT;
+      var tag=p.tagName;
+      if(tag==='SCRIPT'||tag==='STYLE'||tag==='NOSCRIPT')return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var nodes=[];var n;
+  while((n=walker.nextNode()))nodes.push(n);
+  nodes.forEach(function(node){
+    var text=node.nodeValue;
+    Object.keys(dict).forEach(function(fr){text=text.split(fr).join(dict[fr]);});
+    node.nodeValue=text;
+  });
+}
+document.addEventListener('DOMContentLoaded',function(){applyLocalI18n(getSavedLang());});
+</script>
 </body>
 </html>

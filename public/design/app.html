@@ -1398,5 +1398,11 @@ function launchConfetti(){
 }
 
 </script>
+<script>
+function getSavedLang(){try{return localStorage.getItem('site_lang')||'fr';}catch(e){return 'fr';}}
+const D={en:{"Parcours de Préparation":"Preparation Path","Réviser par thème":"Review by topic","Examens blancs":"Mock exams","Mises en situation":"Real-life scenarios","Question":"Question","Score":"Score","Suivante":"Next"},es:{"Parcours de Préparation":"Ruta de preparación","Réviser par thème":"Repasar por tema","Examens blancs":"Exámenes de prueba","Mises en situation":"Situaciones reales","Question":"Pregunta","Score":"Puntuación","Suivante":"Siguiente"},ar:{"Parcours de Préparation":"مسار التحضير","Réviser par thème":"مراجعة حسب الموضوع","Examens blancs":"اختبارات تجريبية","Mises en situation":"مواقف واقعية","Question":"سؤال","Score":"النتيجة","Suivante":"التالي"},pt:{"Parcours de Préparation":"Percurso de preparação","Réviser par thème":"Revisar por tema","Examens blancs":"Provas simuladas","Mises en situation":"Situações reais","Question":"Pergunta","Score":"Pontuação","Suivante":"Próxima"},zh:{"Parcours de Préparation":"备考路径","Réviser par thème":"按主题复习","Examens blancs":"模拟考试","Mises en situation":"情景题","Question":"问题","Score":"得分","Suivante":"下一题"}};
+function applyLang(lang){document.documentElement.lang=lang;document.documentElement.dir=(lang==='ar'?'rtl':'ltr');if(lang==='fr')return;var map=D[lang]||{};var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(node){var p=node.parentElement;if(!p)return 2;var t=p.tagName;return (t==='SCRIPT'||t==='STYLE'||t==='NOSCRIPT')?2:1;}});var a=[],n;while((n=walker.nextNode()))a.push(n);a.forEach(function(node){var txt=node.nodeValue;Object.keys(map).forEach(function(fr){txt=txt.split(fr).join(map[fr]);});node.nodeValue=txt;});}
+document.addEventListener('DOMContentLoaded',function(){applyLang(getSavedLang());});
+</script>
 </body>
 </html>
