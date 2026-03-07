@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { usePayment } from "../context/PaymentContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { STRIPE_PUBLIC_KEY, API_BASE_URL } from "../config/stripe";
-import Header from "../components/Header";
 import { normalizePlan, planMap, plans } from "../data/plans";
-import { addPurchasedPlan, enableDemoAccess, setSelectedPlan } from "../utils/access";
+import { addPurchasedPlan, setSelectedPlan } from "../utils/access";
+import logo from "../assets/logo.png";
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || "").replace(/\/$/, "");
@@ -40,7 +40,7 @@ const CheckoutForm = () => {
     const checkBackend = async () => {
       if (USE_SUPABASE_FUNCTIONS) {
         if (!mounted) return;
-        setBackendReady(Boolean(SUPABASE_URL && SUPABASE_ANON_KEY));
+        setBackendReady(Boolean(SUPABASE_FUNCTIONS_URL));
         return;
       }
       try {
@@ -96,8 +96,10 @@ const CheckoutForm = () => {
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (USE_SUPABASE_FUNCTIONS) {
-        headers.apikey = SUPABASE_ANON_KEY;
-        headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
+        if (SUPABASE_ANON_KEY) {
+          headers.apikey = SUPABASE_ANON_KEY;
+          headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
+        }
       }
 
       // Créer le PaymentIntent côté serveur
@@ -174,20 +176,6 @@ const CheckoutForm = () => {
         <div className="rounded-2xl bg-white p-5 shadow-xl sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">{tr('Paiement sécurisé', 'Secure payment')}</h1>
           <p className="text-center text-sm sm:text-base text-gray-600 mb-7">{tr('Accès illimité à Mon Examen Civique', 'Unlimited access to My Civic Exam')}</p>
-          <div className="mb-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                enableDemoAccess();
-                addPurchasedPlan(selectedPlan);
-                setSelectedPlan(selectedPlan);
-                navigate("/app");
-              }}
-              className="rounded-lg border border-[#d7e3f4] bg-white px-4 py-2 text-sm font-semibold text-[#1a4d8f] hover:bg-[#eef4fb]"
-            >
-              {tr("Bouton test: continuer sans paiement", "Test button: continue without payment")}
-            </button>
-          </div>
 
           <div className="mb-6">
             <p className="mb-3 text-sm font-semibold text-gray-700">{tr('Choisir la formation', 'Choose training')}</p>
@@ -339,11 +327,15 @@ const CheckoutForm = () => {
 
 export default function CheckoutPage() {
   return (
-    <>
-      <Header />
+    <div>
+      <div className="topbar">
+        <img src={logo} alt="Logo" />
+        <div className="topbar-t">Mon Examen <span>Civique</span></div>
+      </div>
+      <div className="tricolor" />
       <Elements stripe={stripePromise}>
         <CheckoutForm />
       </Elements>
-    </>
+    </div>
   );
 }

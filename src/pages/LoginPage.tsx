@@ -5,6 +5,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { setAuthUserFromSupabaseUser } from '../utils/access';
 import './Auth.css';
+import logo from '../assets/logo.png';
 
 type LoginFormState = {
   name: string;
@@ -101,6 +102,7 @@ const LoginPage: React.FC = () => {
         email: form.email.trim().toLowerCase(),
         password: form.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             full_name: form.name || form.email.split('@')[0] || 'Utilisateur',
           },
@@ -224,115 +226,117 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="auth-shell">
-      <div className="auth-glow auth-glow-left" />
-      <div className="auth-glow auth-glow-right" />
-
-      <section className="auth-panel">
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+    <div>
+      <div className="topbar">
+        <img src={logo} alt="Logo" />
+        <div className="topbar-t">Mon Examen <span>Civique</span></div>
+        <div style={{ marginLeft: 'auto' }}>
           <LanguageSwitcher />
         </div>
-        <div className="auth-brand">
-          <p className="auth-badge">{t('auth.badge')}</p>
-          <h1>{isLogin ? t('auth.loginTitle') : t('auth.signupTitle')}</h1>
-          <p className="auth-subtitle">
-            {isLogin
-              ? t('auth.loginSubtitle')
-              : t('auth.signupSubtitle')}
-          </p>
-        </div>
+      </div>
+      <div className="tricolor" />
+      <div className="wrap">
+        <section className="card visible" style={{ display: 'block' }}>
+          <h2 className="dg">{isLogin ? t('auth.loginTitle') : t('auth.signupTitle')}</h2>
+          <p className="card-sub">{isLogin ? t('auth.loginSubtitle') : t('auth.signupSubtitle')}</p>
+          <div style={{ marginBottom: 12 }}>
+            <p className="auth-badge">{t('auth.badge')}</p>
+          </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {!isLogin && (
-            <label>
-              {t('auth.fullName')}
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <div className="field">
+                <label>{t('auth.fullName')}</label>
+                <input
+                  type="text"
+                  placeholder={t('auth.fullNamePlaceholder')}
+                  value={form.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            <div className="field">
+              <label>{t('auth.email')}</label>
               <input
-                type="text"
-                placeholder={t('auth.fullNamePlaceholder')}
-                value={form.name}
-                onChange={(e) => updateField('name', e.target.value)}
+                type="email"
+                placeholder={t('auth.emailPlaceholder')}
+                value={form.email}
+                onChange={(e) => updateField('email', e.target.value)}
                 required
               />
-            </label>
-          )}
+            </div>
 
-          <label>
-            {t('auth.email')}
-            <input
-              type="email"
-              placeholder={t('auth.emailPlaceholder')}
-              value={form.email}
-              onChange={(e) => updateField('email', e.target.value)}
-              required
-            />
-          </label>
-
-          <label>
-            {t('auth.password')}
-            <input
-              type="password"
-              placeholder={t('auth.passwordPlaceholder')}
-              value={form.password}
-              onChange={(e) => updateField('password', e.target.value)}
-              required
-            />
-          </label>
-
-          {!isLogin && (
-            <label>
-              {t('auth.confirmPassword')}
+            <div className="field">
+              <label>{t('auth.password')}</label>
               <input
                 type="password"
-                placeholder={t('auth.confirmPasswordPlaceholder')}
-                value={form.confirmPassword}
-                onChange={(e) => updateField('confirmPassword', e.target.value)}
+                placeholder={t('auth.passwordPlaceholder')}
+                value={form.password}
+                onChange={(e) => updateField('password', e.target.value)}
                 required
               />
-            </label>
-          )}
+            </div>
 
-          {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
-          {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
+            {!isLogin && (
+              <div className="field">
+                <label>{t('auth.confirmPassword')}</label>
+                <input
+                  type="password"
+                  placeholder={t('auth.confirmPasswordPlaceholder')}
+                  value={form.confirmPassword}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
+                  required
+                />
+              </div>
+            )}
 
-          <button type="submit" className="auth-submit" disabled={isSubmitting}>
-            {isSubmitting ? t('auth.submitLoading') : isLogin ? t('auth.submitLogin') : t('auth.submitSignup')}
-          </button>
+            {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
+            {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
 
-          {isLogin && (
-            <button
-              type="button"
-              className="auth-switch"
-              onClick={handleForgotPassword}
-              disabled={isSubmitting}
-            >
-              {tr('Mot de passe oublié ?', 'Forgot password?')}
+            <button type="submit" className="nav-btn nav-next" disabled={isSubmitting} style={{ width: '100%' }}>
+              {isSubmitting ? t('auth.submitLoading') : isLogin ? t('auth.submitLogin') : t('auth.submitSignup')}
             </button>
-          )}
 
-          {isLogin && (
-            <button
-              type="button"
-              className="auth-switch"
-              onClick={handleMagicLinkLogin}
-              disabled={isSubmitting}
-            >
-              {tr('Connexion sans mot de passe (lien magique)', 'Passwordless login (magic link)')}
-            </button>
-          )}
+            <div className="card-nav" style={{ marginTop: 14, flexDirection: 'column', alignItems: 'stretch' }}>
+              {isLogin && (
+                <button
+                  type="button"
+                  className="auth-switch"
+                  onClick={handleForgotPassword}
+                  disabled={isSubmitting}
+                >
+                  {tr('Mot de passe oublié ?', 'Forgot password?')}
+                </button>
+              )}
 
-          <button
-            type="button"
-            className="auth-switch"
-            onClick={() => {
-              setIsLogin((prev) => !prev);
-              setErrorMessage('');
-              setSuccessMessage('');
-            }}
-          >
-            {isLogin ? t('auth.switchToSignup') : t('auth.switchToLogin')}
-          </button>
-        </form>
-      </section>
+              {isLogin && (
+                <button
+                  type="button"
+                  className="auth-switch"
+                  onClick={handleMagicLinkLogin}
+                  disabled={isSubmitting}
+                >
+                  {tr('Connexion sans mot de passe (lien magique)', 'Passwordless login (magic link)')}
+                </button>
+              )}
+
+              <button
+                type="button"
+                className="auth-switch"
+                onClick={() => {
+                  setIsLogin((prev) => !prev);
+                  setErrorMessage('');
+                  setSuccessMessage('');
+                }}
+              >
+                {isLogin ? t('auth.switchToSignup') : t('auth.switchToLogin')}
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
   );
 };
