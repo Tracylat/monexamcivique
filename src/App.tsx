@@ -1,25 +1,27 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
+import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import ChoicePage from './pages/ChoicePage';
 import CheckoutPage from './pages/CheckoutPage';
-import UserSpacePage from './pages/UserSpacePage';
-import DashboardPage from './pages/DashboardPage';
 import { PaymentProvider } from './context/PaymentContext';
 import { getPurchasedPlans, isLoggedIn, setAuthUserFromSupabaseUser } from './utils/access';
 
-function StaticHtmlPage({ src }: { src: string }) {
+type ProtectedRouteProps = { element: ReactElement };
+type DesignPageProps = { src: string; title: string };
+
+function DesignPage({ src, title }: DesignPageProps) {
   return (
     <iframe
       src={src}
-      title={src}
-      style={{ display: 'block', width: '100%', height: '100vh', border: 0, background: '#fff' }}
+      title={title}
+      style={{ border: 0, width: '100%', height: '100vh', display: 'block' }}
+      allow="clipboard-read; clipboard-write; fullscreen"
     />
   );
 }
-
-type ProtectedRouteProps = { element: ReactElement };
 
 function RequireAuth({ element }: ProtectedRouteProps) {
   const location = useLocation();
@@ -33,6 +35,43 @@ function RequireAuth({ element }: ProtectedRouteProps) {
 function RequirePaidPlan({ element }: ProtectedRouteProps) {
   if (getPurchasedPlans().length === 0) return <Navigate to="/choice" replace />;
   return element;
+}
+
+function RouteHistoryTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const current = `${location.pathname}${location.search}`;
+    const previous = sessionStorage.getItem('currentPath');
+    if (previous && previous !== current) {
+      sessionStorage.setItem('lastVisitedPath', previous);
+    }
+    sessionStorage.setItem('currentPath', current);
+  }, [location.pathname, location.search]);
+
+  return null;
+}
+
+function RecoveryRedirectGuard() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const hash = location.hash || '';
+    const isRecoveryFlow =
+      searchParams.get('type') === 'recovery' ||
+      searchParams.has('code') ||
+      searchParams.has('token_hash') ||
+      hash.includes('type=recovery') ||
+      hash.includes('access_token=') ||
+      hash.includes('refresh_token=');
+
+    if (location.pathname === '/' && isRecoveryFlow) {
+      window.location.replace(`/reset-password${location.search}${location.hash}`);
+    }
+  }, [location.pathname, location.search, location.hash]);
+
+  return null;
 }
 
 function App() {
@@ -65,16 +104,19 @@ function App() {
   return (
     <PaymentProvider>
       <BrowserRouter>
+        <RouteHistoryTracker />
+        <RecoveryRedirectGuard />
         <Routes>
-          <Route path="/" element={<StaticHtmlPage src="/design/index.html" />} />
-          <Route path="/app/free" element={<StaticHtmlPage src="/design/test.html" />} />
-          <Route path="/inscription" element={<Navigate to="/login?next=%2Fchoice" replace />} />
-          <Route path="/app" element={<RequireAuth element={<RequirePaidPlan element={<StaticHtmlPage src="/design/app.html" />} />} />} />
+          <Route path="/" element={<DesignPage src="/design/index.html" title="Mon Examen Civique - Accueil" />} />
+          <Route path="/app/free" element={<DesignPage src="/design/test.html" title="Mon Examen Civique - Test Gratuit" />} />
+          <Route path="/inscription" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/choice" element={<RequireAuth element={<ChoicePage />} />} />
           <Route path="/checkout" element={<RequireAuth element={<CheckoutPage />} />} />
-          <Route path="/espace" element={<RequireAuth element={<UserSpacePage />} />} />
-          <Route path="/dashboard" element={<RequireAuth element={<DashboardPage />} />} />
+          <Route path="/app" element={<RequireAuth element={<RequirePaidPlan element={<DesignPage src="/design/app.html" title="Mon Examen Civique - Espace Révision" />} />} />} />
+          <Route path="/espace" element={<RequireAuth element={<DesignPage src="/design/app.html" title="Mon Examen Civique - Espace Révision" />} />} />
+          <Route path="/dashboard" element={<RequireAuth element={<DesignPage src="/design/app.html" title="Mon Examen Civique - Dashboard" />} />} />
           <Route path="/admin/quiz" element={<RequireAuth element={<DashboardPage />} />} />
           <Route path="/admin/questions" element={<RequireAuth element={<DashboardPage />} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
