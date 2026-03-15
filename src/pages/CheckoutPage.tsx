@@ -19,7 +19,7 @@ const USE_SUPABASE_FUNCTIONS = Boolean(SUPABASE_FUNCTIONS_URL);
 
 const CheckoutForm = () => {
   const { i18n } = useTranslation();
-  const tr = (fr: string, en: string) => (i18n.resolvedLanguage === 'en' ? en : fr);
+  const tr = (fr: string, en: string) => ((i18n.resolvedLanguage || 'fr').startsWith('fr') ? fr : en);
   const stripe = useStripe();
   const elements = useElements();
   const { markAsPaid } = usePayment();
@@ -326,11 +326,31 @@ const CheckoutForm = () => {
 };
 
 export default function CheckoutPage() {
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const tr = (fr: string, en: string) => ((i18n.resolvedLanguage || 'fr').startsWith('fr') ? fr : en);
+
   return (
     <div>
       <div className="topbar">
-        <img src={logo} alt="Logo" />
-        <div className="topbar-t">Mon Examen <span>Civique</span></div>
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+          aria-label="Aller à l'accueil"
+          title="Mon Examen Civique"
+        >
+          <img src={logo} alt="Logo Mon Examen Civique" style={{ height: 56, width: 'auto' }} />
+        </button>
+        <div style={{ marginLeft: 'auto' }}>
+          <button
+            type="button"
+            className="nav-btn nav-back"
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/choice'))}
+          >
+            ← {tr('Retour', 'Back')}
+          </button>
+        </div>
       </div>
       <div className="tricolor" />
       <Elements stripe={stripePromise}>

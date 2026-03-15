@@ -348,43 +348,25 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="topbar">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
-          aria-label="Aller à l'accueil"
-          title="Mon Examen Civique"
-        >
-          <img src={logo} alt="Logo Mon Examen Civique" style={{ height: 84, width: 'auto' }} />
-        </button>
-        <div style={{ marginLeft: 'auto' }}>
-          <LanguageSwitcher />
-        </div>
-      </div>
-      <div className="tricolor" />
-
-      <div className="wrap">
-        <div className="card-nav" style={{ marginBottom: 12 }}>
+    <div className="auth-shell">
+      <div className="auth-glow auth-glow-left" />
+      <div className="auth-glow auth-glow-right" />
+      <div className="auth-panel">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <button
             type="button"
-            className="nav-btn nav-back"
-            onClick={() => {
-              if (window.history.length > 1) {
-                navigate(-1);
-                return;
-              }
-              const last = sessionStorage.getItem('lastVisitedPath');
-              if (last) navigate(last);
-            }}
+            onClick={() => navigate('/')}
+            style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+            aria-label="Aller à l'accueil"
+            title="Mon Examen Civique"
           >
-            ← {tr('Retour', 'Back')}
+            <img src={logo} alt="Logo Mon Examen Civique" style={{ height: 56, width: 'auto' }} />
           </button>
+          <LanguageSwitcher />
         </div>
 
-        <section className="card visible" style={{ display: 'block' }}>
-          <h2 className="dg">
+        <div className="auth-brand">
+          <h1>
             {isRecoveryMode
               ? tr('Nouveau mot de passe', 'New password')
               : useCodeReset
@@ -392,8 +374,8 @@ const LoginPage: React.FC = () => {
                 : isLogin
                   ? t('auth.loginTitle')
                   : t('auth.signupTitle')}
-          </h2>
-          <p className="card-sub">
+          </h1>
+          <p className="auth-subtitle">
             {isRecoveryMode
               ? tr('Choisissez un nouveau mot de passe pour votre compte.', 'Choose a new password for your account.')
               : useCodeReset
@@ -402,15 +384,80 @@ const LoginPage: React.FC = () => {
                   ? t('auth.loginSubtitle')
                   : t('auth.signupSubtitle')}
           </p>
+          <p className="auth-badge">{t('auth.badge')}</p>
+        </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <p className="auth-badge">{t('auth.badge')}</p>
-          </div>
+        {useCodeReset && !isRecoveryMode ? (
+          <form className="auth-form" onSubmit={handleVerifyResetCode}>
+            <label>
+              {t('auth.email')}
+              <input
+                type="email"
+                placeholder={t('auth.emailPlaceholder')}
+                value={form.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                required
+              />
+            </label>
 
-          {useCodeReset && !isRecoveryMode ? (
-            <form className="auth-form" onSubmit={handleVerifyResetCode}>
-              <div className="field">
-                <label>{t('auth.email')}</label>
+            {resetCodeSent && (
+              <label>
+                {tr('Code reçu par e-mail', 'Code received by email')}
+                <input
+                  type="text"
+                  placeholder={tr('Entrez le code', 'Enter the code')}
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value)}
+                  required
+                />
+              </label>
+            )}
+
+            {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
+            {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
+
+            {!resetCodeSent ? (
+              <button type="button" className="auth-submit" disabled={isSubmitting} onClick={handleSendResetCode}>
+                {isSubmitting ? tr('Envoi...', 'Sending...') : tr('Envoyer le code', 'Send code')}
+              </button>
+            ) : (
+              <button type="submit" className="auth-submit" disabled={isSubmitting}>
+                {isSubmitting ? tr('Vérification...', 'Verifying...') : tr('Vérifier le code', 'Verify code')}
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="auth-switch"
+              onClick={() => {
+                setUseCodeReset(false);
+                setResetCodeSent(false);
+                setResetCode('');
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+            >
+              {tr('Retour à la connexion', 'Back to login')}
+            </button>
+          </form>
+        ) : (
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {!isLogin && !isRecoveryMode && (
+              <label>
+                {t('auth.fullName')}
+                <input
+                  type="text"
+                  placeholder={t('auth.fullNamePlaceholder')}
+                  value={form.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  required
+                />
+              </label>
+            )}
+
+            {!isRecoveryMode && (
+              <label>
+                {t('auth.email')}
                 <input
                   type="email"
                   placeholder={t('auth.emailPlaceholder')}
@@ -418,161 +465,89 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => updateField('email', e.target.value)}
                   required
                 />
-              </div>
+              </label>
+            )}
 
-              {resetCodeSent && (
-                <div className="field">
-                  <label>{tr('Code reçu par e-mail', 'Code received by email')}</label>
-                  <input
-                    type="text"
-                    placeholder={tr('Entrez le code', 'Enter the code')}
-                    value={resetCode}
-                    onChange={(e) => setResetCode(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
+            <label>
+              {isRecoveryMode ? tr('Nouveau mot de passe', 'New password') : t('auth.password')}
+              <input
+                type="password"
+                placeholder={isRecoveryMode ? tr('Entrez votre nouveau mot de passe', 'Enter your new password') : t('auth.passwordPlaceholder')}
+                value={form.password}
+                onChange={(e) => updateField('password', e.target.value)}
+                required
+              />
+            </label>
 
-              {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
-              {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
-
-              {!resetCodeSent ? (
-                <button type="button" className="nav-btn nav-next" disabled={isSubmitting} style={{ width: '100%' }} onClick={handleSendResetCode}>
-                  {isSubmitting ? tr('Envoi...', 'Sending...') : tr('Envoyer le code', 'Send code')}
-                </button>
-              ) : (
-                <button type="submit" className="nav-btn nav-next" disabled={isSubmitting} style={{ width: '100%' }}>
-                  {isSubmitting ? tr('Vérification...', 'Verifying...') : tr('Vérifier le code', 'Verify code')}
-                </button>
-              )}
-
-              <div className="card-nav" style={{ marginTop: 14, flexDirection: 'column', alignItems: 'stretch' }}>
-                <button
-                  type="button"
-                  className="auth-switch"
-                  onClick={() => {
-                    setUseCodeReset(false);
-                    setResetCodeSent(false);
-                    setResetCode('');
-                    setErrorMessage('');
-                    setSuccessMessage('');
-                  }}
-                >
-                  {tr('Retour à la connexion', 'Back to login')}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <form className="auth-form" onSubmit={handleSubmit}>
-              {!isLogin && !isRecoveryMode && (
-                <div className="field">
-                  <label>{t('auth.fullName')}</label>
-                  <input
-                    type="text"
-                    placeholder={t('auth.fullNamePlaceholder')}
-                    value={form.name}
-                    onChange={(e) => updateField('name', e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              {!isRecoveryMode && (
-                <div className="field">
-                  <label>{t('auth.email')}</label>
-                  <input
-                    type="email"
-                    placeholder={t('auth.emailPlaceholder')}
-                    value={form.email}
-                    onChange={(e) => updateField('email', e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              <div className="field">
-                <label>{isRecoveryMode ? tr('Nouveau mot de passe', 'New password') : t('auth.password')}</label>
+            {(!isLogin || isRecoveryMode) && (
+              <label>
+                {isRecoveryMode ? tr('Confirmez le nouveau mot de passe', 'Confirm new password') : t('auth.confirmPassword')}
                 <input
                   type="password"
-                  placeholder={isRecoveryMode ? tr('Entrez votre nouveau mot de passe', 'Enter your new password') : t('auth.passwordPlaceholder')}
-                  value={form.password}
-                  onChange={(e) => updateField('password', e.target.value)}
+                  placeholder={isRecoveryMode ? tr('Retapez le nouveau mot de passe', 'Re-enter the new password') : t('auth.confirmPasswordPlaceholder')}
+                  value={form.confirmPassword}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
                   required
                 />
-              </div>
+              </label>
+            )}
 
-              {(!isLogin || isRecoveryMode) && (
-                <div className="field">
-                  <label>{isRecoveryMode ? tr('Confirmez le nouveau mot de passe', 'Confirm new password') : t('auth.confirmPassword')}</label>
-                  <input
-                    type="password"
-                    placeholder={isRecoveryMode ? tr('Retapez le nouveau mot de passe', 'Re-enter the new password') : t('auth.confirmPasswordPlaceholder')}
-                    value={form.confirmPassword}
-                    onChange={(e) => updateField('confirmPassword', e.target.value)}
-                    required
-                  />
-                </div>
-              )}
+            {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
+            {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
 
-              {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
-              {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
+            <button type="submit" className="auth-submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? t('auth.submitLoading')
+                : isRecoveryMode
+                  ? tr('Mettre à jour le mot de passe', 'Update password')
+                  : isLogin
+                    ? t('auth.submitLogin')
+                    : t('auth.submitSignup')}
+            </button>
 
-              <button type="submit" className="nav-btn nav-next" disabled={isSubmitting} style={{ width: '100%' }}>
-                {isSubmitting
-                  ? t('auth.submitLoading')
-                  : isRecoveryMode
-                    ? tr('Mettre à jour le mot de passe', 'Update password')
-                    : isLogin
-                      ? t('auth.submitLogin')
-                      : t('auth.submitSignup')}
+            {isLogin && !isRecoveryMode && (
+              <button
+                type="button"
+                className="auth-switch"
+                onClick={() => {
+                  setUseCodeReset(true);
+                  setResetCodeSent(false);
+                  setResetCode('');
+                  setErrorMessage('');
+                  setSuccessMessage('');
+                }}
+                disabled={isSubmitting}
+              >
+                {tr('Réinitialiser avec un code e-mail', 'Reset with email code')}
               </button>
+            )}
 
-              <div className="card-nav" style={{ marginTop: 14, flexDirection: 'column', alignItems: 'stretch' }}>
-                {isLogin && !isRecoveryMode && (
-                  <button
-                    type="button"
-                    className="auth-switch"
-                    onClick={() => {
-                      setUseCodeReset(true);
-                      setResetCodeSent(false);
-                      setResetCode('');
-                      setErrorMessage('');
-                      setSuccessMessage('');
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    {tr('Réinitialiser avec un code e-mail', 'Reset with email code')}
-                  </button>
-                )}
+            {isLogin && !isRecoveryMode && (
+              <button
+                type="button"
+                className="auth-switch"
+                onClick={handleMagicLinkLogin}
+                disabled={isSubmitting}
+              >
+                {tr('Connexion sans mot de passe (lien magique)', 'Passwordless login (magic link)')}
+              </button>
+            )}
 
-                {isLogin && !isRecoveryMode && (
-                  <button
-                    type="button"
-                    className="auth-switch"
-                    onClick={handleMagicLinkLogin}
-                    disabled={isSubmitting}
-                  >
-                    {tr('Connexion sans mot de passe (lien magique)', 'Passwordless login (magic link)')}
-                  </button>
-                )}
-
-                {!isRecoveryMode && (
-                  <button
-                    type="button"
-                    className="auth-switch"
-                    onClick={() => {
-                      setIsLogin((prev) => !prev);
-                      setErrorMessage('');
-                      setSuccessMessage('');
-                    }}
-                  >
-                    {isLogin ? t('auth.switchToSignup') : t('auth.switchToLogin')}
-                  </button>
-                )}
-              </div>
-            </form>
-          )}
-        </section>
+            {!isRecoveryMode && (
+              <button
+                type="button"
+                className="auth-switch"
+                onClick={() => {
+                  setIsLogin((prev) => !prev);
+                  setErrorMessage('');
+                  setSuccessMessage('');
+                }}
+              >
+                {isLogin ? t('auth.switchToSignup') : t('auth.switchToLogin')}
+              </button>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );
