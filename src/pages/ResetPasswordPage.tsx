@@ -134,89 +134,77 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="topbar">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
-          aria-label="Aller à l'accueil"
-          title="Mon Examen Civique"
-        >
-          <img src={logo} alt="Logo Mon Examen Civique" style={{ height: 84, width: 'auto' }} />
-        </button>
-        <div style={{ marginLeft: 'auto' }}>
-          <LanguageSwitcher />
-        </div>
-      </div>
-      <div className="tricolor" />
-
-      <div className="wrap">
-        <div className="card-nav" style={{ marginBottom: 12 }}>
+    <div className="auth-shell">
+      <div className="auth-glow auth-glow-left" />
+      <div className="auth-glow auth-glow-right" />
+      <div className="auth-panel">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <button
             type="button"
-            className="nav-btn nav-back"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/')}
+            style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+            aria-label="Aller à l'accueil"
+            title="Mon Examen Civique"
           >
-            ← {tr('Retour', 'Back')}
+            <img src={logo} alt="Logo Mon Examen Civique" style={{ height: 56, width: 'auto' }} />
           </button>
+          <LanguageSwitcher />
         </div>
 
-        <section className="card visible" style={{ display: 'block' }}>
-          <h2 className="dg">{tr('Réinitialiser le mot de passe', 'Reset password')}</h2>
-          <p className="card-sub">
+        <div className="auth-brand">
+          <h1>{tr('Réinitialiser le mot de passe', 'Reset password')}</h1>
+          <p className="auth-subtitle">
             {tr(
               'Choisissez un nouveau mot de passe pour votre compte.',
               'Choose a new password for your account.',
             )}
           </p>
+        </div>
 
-          {!isReady && !errorMessage && (
-            <p className="auth-message auth-success">
-              {tr('Vérification du lien de réinitialisation...', 'Checking reset link...')}
-            </p>
-          )}
+        {!isReady && !errorMessage && (
+          <p className="auth-message auth-success">
+            {tr('Vérification du lien de réinitialisation...', 'Checking reset link...')}
+          </p>
+        )}
 
-          {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
-          {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
+        {errorMessage && <p className="auth-message auth-error">{errorMessage}</p>}
+        {successMessage && <p className="auth-message auth-success">{successMessage}</p>}
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="field">
-              <label>{tr('Nouveau mot de passe', 'New password')}</label>
-              <input
-                type="password"
-                placeholder={tr('Entrez votre nouveau mot de passe', 'Enter your new password')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={!isReady || isSubmitting}
-              />
-            </div>
-
-            <div className="field">
-              <label>{tr('Confirmez le nouveau mot de passe', 'Confirm new password')}</label>
-              <input
-                type="password"
-                placeholder={tr('Retapez votre mot de passe', 'Re-enter your password')}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={!isReady || isSubmitting}
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="nav-btn nav-next"
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <label>
+            {tr('Nouveau mot de passe', 'New password')}
+            <input
+              type="password"
+              placeholder={tr('Entrez votre nouveau mot de passe', 'Enter your new password')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
               disabled={!isReady || isSubmitting}
-              style={{ width: '100%' }}
-            >
-              {isSubmitting
-                ? tr('Mise à jour...', 'Updating...')
-                : tr('Mettre à jour le mot de passe', 'Update password')}
-            </button>
-          </form>
-        </section>
+            />
+          </label>
+
+          <label>
+            {tr('Confirmez le nouveau mot de passe', 'Confirm new password')}
+            <input
+              type="password"
+              placeholder={tr('Retapez votre mot de passe', 'Re-enter your password')}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={!isReady || isSubmitting}
+            />
+          </label>
+
+          <button type="submit" className="auth-submit" disabled={!isReady || isSubmitting}>
+            {isSubmitting
+              ? tr('Mise à jour...', 'Updating...')
+              : tr('Mettre à jour le mot de passe', 'Update password')}
+          </button>
+
+          <button type="button" className="auth-switch" onClick={() => navigate('/login')}>
+            ← {tr('Retour', 'Back')}
+          </button>
+        </form>
       </div>
     </div>
   );
