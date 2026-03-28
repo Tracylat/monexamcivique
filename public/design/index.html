@@ -31,6 +31,8 @@ h1,h2,h3,h4,.dg{font-family:'Darker Grotesque',sans-serif}
 .nav-links{display:flex;gap:20px;align-items:center}
 .nav-links a{text-decoration:none;font-family:'Darker Grotesque',sans-serif;font-weight:600;font-size:1rem;color:var(--muted);transition:color .2s}
 .nav-links a:hover{color:var(--bleu)}
+.nav-links a.nav-login{background:var(--bleu);color:#fff;border-radius:10px;padding:8px 16px;font-weight:800;box-shadow:0 6px 18px rgba(15,52,102,.2)}
+.nav-links a.nav-login:hover{background:var(--bleu-l);color:#fff;transform:translateY(-1px)}
 .nav-lang{display:flex;align-items:center;gap:8px}
 .nav-lang-select{height:38px;min-width:170px;padding:0 12px;border:1px solid #dbe1ee;border-radius:10px;background:#fff;color:var(--bleu);font-family:'Darker Grotesque',sans-serif;font-weight:700;font-size:.95rem;outline:none}
 .nav-lang-select:focus{border-color:var(--bleu);box-shadow:0 0 0 3px rgba(15,52,102,.12)}
@@ -215,7 +217,7 @@ body{top:0!important}
 
 
 /* RESPONSIVE */
-@media(max-width:900px){.hero-grid,.ccm-grid,.niv-grid,.tem-grid{grid-template-columns:1fr}.hero-left h1{font-size:2.2rem}.ccm-arrow{display:none}.nav-links a:not(:last-child):not(.nav-lang){display:none}.tarif-list,.tarif-vs{grid-template-columns:1fr}.nav-lang-select{min-width:140px;height:34px;font-size:.9rem}}
+@media(max-width:900px){.hero-grid,.ccm-grid,.niv-grid,.tem-grid{grid-template-columns:1fr}.hero-left h1{font-size:2.2rem}.ccm-arrow{display:none}.nav-links a:not(.nav-login){display:none}.tarif-list,.tarif-vs{grid-template-columns:1fr}.nav-lang-select{min-width:140px;height:34px;font-size:.9rem}}
 @media(max-width:600px){.hero-left h1{font-size:1.8rem}.sec-t{font-size:1.7rem}.tarif-price{font-size:3rem}.hero-stats{flex-direction:column;gap:10px}.urg-sub{font-size:.9rem}.urgency{padding:14px 16px}.urg-main{font-size:1.15rem}}
 </style>
 </head>
@@ -238,6 +240,7 @@ body{top:0!important}
       <a href="#parcours">Comment ça marche</a>
       <a href="#niveaux">Niveaux</a>
       <a href="#faq">FAQ</a>
+      <a href="/login" target="_top" class="nav-login">Connexion</a>
       <div class="nav-lang">
         <select id="topLangSelect" class="nav-lang-select" aria-label="Changer la langue">
           <option value="fr">🇫🇷 Français</option>
